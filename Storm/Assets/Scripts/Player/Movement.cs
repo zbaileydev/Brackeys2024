@@ -113,9 +113,19 @@ public class Movement : MonoBehaviour
     void OnCollisionEnter2D(Collision2D other)
     {
         // Some backup checking in case our velocity is clipped on something
-        if (other.gameObject.tag == "Floor" && !isGrounded)
+        if (other.gameObject.CompareTag("Floor") && !isGrounded)
         {
             isGrounded = true;
+        }
+
+        //                      TEMPORARY
+        // TODO: Move to new script that handles loot and inventory ||
+        //                                                          \/
+        if(other.gameObject.CompareTag("Loot Container"))
+        {
+            string item = other.gameObject.GetComponent<ILootContainer>().GetLoot();
+            if (item != string.Empty)
+                Debug.Log($"Collected {item}");
         }
     }
 }
