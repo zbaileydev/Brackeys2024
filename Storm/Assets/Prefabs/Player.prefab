@@ -398,7 +398,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.6, y: 1}
   m_EdgeRadius: 0
 --- !u!50 &8598306330289361134
 Rigidbody2D:
@@ -439,13 +439,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d1ed04489c03c24d89449626feb8be5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  t: {fileID: 0}
   steps: {fileID: 0}
   music: {fileID: 0}
   speed: 10
   jumpThrust: 15
   hammer: {fileID: 1325247163269234935}
-  stetchHeight: 1.1
-  stetchWidth: 0.9
+  stetchHeight: 1.2
+  stetchWidth: 0.5
+  originalHeight: 1
+  originalWidth: 0.6
 --- !u!114 &6228405285423063770
 MonoBehaviour:
   m_ObjectHideFlags: 0
