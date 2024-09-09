@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 
 public class Movement : MonoBehaviour
 {
-    public Tilemap t;
+    public WorldGenerator worldGenerator;
     public AudioSource steps;
     public AudioSource music;
 
@@ -23,16 +23,13 @@ public class Movement : MonoBehaviour
 
     private float playerOriginalScale = 1f;
 
-
     bool isGrounded = true;
     bool stepSounds = false;
 
-    
     PlayerGraphics playerGraphics;
     Rigidbody2D rb;
     //RectTransform crosshair;
 
-    // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -41,7 +38,6 @@ public class Movement : MonoBehaviour
         //music.Play();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))
@@ -71,7 +67,7 @@ public class Movement : MonoBehaviour
         MoveHorizontal();
 
         if(Input.GetMouseButtonDown(0))
-            t.GetComponent<WorldGenerator>().DeleteTileAt(transform.position + Vector3.down);
+            worldGenerator.DeleteTileAt(transform.position + Vector3.down);
     }
 
 
@@ -83,6 +79,8 @@ public class Movement : MonoBehaviour
         movement *= Time.deltaTime;
         // Move the player gameobject based on the X input 
         transform.Translate(movement);
+
+        worldGenerator.xPos = Mathf.RoundToInt(transform.position.x);
         /*
         // Only play SFX if we are moving and havent already started the SFX
         if (inputX != 0 && !stepSounds)
