@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 
 public class Movement : MonoBehaviour
 {
+    public Tilemap t;
     public AudioSource steps;
     public AudioSource music;
 
@@ -50,7 +52,7 @@ public class Movement : MonoBehaviour
         //Vector3 mousePos = Input.mousePosition;
         //Vector3 editedPos = new Vector3(mousePos.x, mousePos.y, 0);
         //crosshair.anchoredPosition = editedPos;
-        
+
         if (rb.velocity.y == 0)
         {
             isGrounded = true;
@@ -67,6 +69,9 @@ public class Movement : MonoBehaviour
         }
         // Function to handle our X-axis movement
         MoveHorizontal();
+
+        if(Input.GetMouseButtonDown(0))
+            t.SetTile(t.WorldToCell(transform.position + Vector3.down), null);
     }
 
 
