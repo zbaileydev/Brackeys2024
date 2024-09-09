@@ -167,6 +167,11 @@ Transform:
   - {fileID: 1652438962}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1382835224 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8598306330289361121, guid: 28f386052514e6d47a99acc69da225a9, type: 3}
+  m_PrefabInstance: {fileID: 1469066412}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1469066412
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -196,16 +201,24 @@ PrefabInstance:
       value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 2576048666665199130, guid: 28f386052514e6d47a99acc69da225a9, type: 3}
+      propertyPath: groundTilemap
+      value: 
+      objectReference: {fileID: 1652438964}
+    - target: {fileID: 2576048666665199130, guid: 28f386052514e6d47a99acc69da225a9, type: 3}
       propertyPath: originalWidth
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2576048666665199130, guid: 28f386052514e6d47a99acc69da225a9, type: 3}
+      propertyPath: worldGenerator
+      value: 
+      objectReference: {fileID: 1652438966}
     - target: {fileID: 8598306330289361121, guid: 28f386052514e6d47a99acc69da225a9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1.91
       objectReference: {fileID: 0}
     - target: {fileID: 8598306330289361121, guid: 28f386052514e6d47a99acc69da225a9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.82
+      value: 5.87
       objectReference: {fileID: 0}
     - target: {fileID: 8598306330289361121, guid: 28f386052514e6d47a99acc69da225a9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -475,10 +488,10 @@ MonoBehaviour:
     depth: 0.25
   - tile: {fileID: 11400000, guid: 9cdd0a4d09381645280162afcc2a928a, type: 2}
     depth: 0
-  chunkSize: 25
-  chunkBottomLimit: -10
+  chunkSize: 22
+  chunkBottomLimit: -8
   seed: 0
-  octaves: 3
+  octaves: 2
   amplitude: 20
   scale: 0.2
   frequency: 2.5
@@ -496,6 +509,8 @@ GameObject:
   - component: {fileID: 2113173389}
   - component: {fileID: 2113173388}
   - component: {fileID: 2113173387}
+  - component: {fileID: 2113173391}
+  - component: {fileID: 2113173390}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -577,6 +592,65 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2113173390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2113173386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3db67a6af623f9ffab91bddabf4fa5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 1382835224}
+  smoothness: 5
+  offset: {x: 0, y: 0, z: -10}
+--- !u!114 &2113173391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2113173386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

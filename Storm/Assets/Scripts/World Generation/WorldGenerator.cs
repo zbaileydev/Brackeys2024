@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -8,14 +7,12 @@ public class WorldGenerator : MonoBehaviour
 {
     [System.Serializable]
     public struct Tile_ {
-        // public Tile tile;
         public Tile tile;
         [Range(0,1)]
         public float depth;
     }
 
     Tilemap tilemap;
-    // Dictionary<Vector3Int, Tile> playerChanges = new();
     Dictionary<Vector3, Tile> playerChanges = new();
 
     public Tile_[] tiles;
@@ -47,38 +44,29 @@ public class WorldGenerator : MonoBehaviour
     void Start()
     {
         tilemap = GetComponent<Tilemap>();
-        // seed = (int)Random.Range(-0xFFFFFFFF, 0xFFFFFFFF);
         Random.InitState(seed);
         xPos = 0;
 
         playerChanges.Clear();
-
-        // BuildWorld();
     }
 
     public void DeleteTileAt(Vector3 pos)
     {
-        playerChanges.Add(pos, null);
-        update = true;
-        // DeleteTile(tilemap.WorldToCell(pos));
+        if (!playerChanges.Any(x => x.Key.Equals(pos)))
+        {
+            playerChanges.Add(pos, null);
+            update = true;
+        }
     }
-
-    // void DeleteTile(Vector3Int tile)
-    // {
-    //     playerChanges.Add(tile, null);
-    // }
 
     public void ModifyTileAt(Vector3 pos, Tile newTile)
     {
-        playerChanges.Add(pos, newTile);
-        update = true;
-        // ModifyTile(tilemap.WorldToCell(pos), newTile);
+        if (!playerChanges.Any(x => x.Key.Equals(pos)))
+        {
+            playerChanges.Add(pos, newTile);
+            update = true;
+        }
     }
-
-    // void ModifyTile(Vector3Int tile, Tile newTile)
-    // {
-    //     playerChanges.Add(tile, newTile);
-    // }
 
     void Update()
     {
@@ -105,10 +93,7 @@ public class WorldGenerator : MonoBehaviour
         {
             int noiseVal = Mathf.RoundToInt(GetNoiseVal(x));
 
-            // tilemap.SetTile(new Vector3Int(x, noiseVal), tiles[0].tile);
             FillColumn(x, noiseVal);
-
-            // tilemap.SetTile(new Vector3Int(x, chunkBottomLimit), tiles[^1].tile);
         }
     }
 
@@ -149,16 +134,7 @@ public class WorldGenerator : MonoBehaviour
             float depth = Remap(y, chunkBottomLimit, maxHeight, 0, 1);
 
             TileBase availableTile = tiles.ToList().FirstOrDefault(x => x.depth <= depth).tile;
-            // TileBase[] availableTiles = tiles.ToList().FindAll(x => x.depth < depth).Select(x => x.tile).ToArray();
 
-
-            // if (availableTiles.Length == 0)
-            // {
-            //     Debug.LogError("There probably isn't a tile with a depth of 0!", this);
-            //     continue;
-            // }
-
-            // int randomTile = Random.Range(0, availableTiles.Length - 1);
             tilemap.SetTile(new Vector3Int(x, y), availableTile);
         }
     }
