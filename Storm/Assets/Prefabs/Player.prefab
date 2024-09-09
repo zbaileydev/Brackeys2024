@@ -444,8 +444,10 @@ MonoBehaviour:
   speed: 10
   jumpThrust: 15
   hammer: {fileID: 1325247163269234935}
-  stetchHeight: 1.1
-  stetchWidth: 0.9
+  stetchHeight: 0.6
+  stetchWidth: 0.25
+  originalHeight: 0.5
+  originalWidth: 0.3
 --- !u!114 &6228405285423063770
 MonoBehaviour:
   m_ObjectHideFlags: 0
