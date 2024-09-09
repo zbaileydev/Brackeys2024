@@ -13,9 +13,19 @@ public class Movement : MonoBehaviour
     //public Image reticleImage;
     public GameObject hammer;
 
+    public float stetchHeight = 0.6f;
+    public float stetchWidth = 0.25f;
+
+    public float originalHeight = 0.5f;
+    public float originalWidth = 0.3f;
+
+    private float playerOriginalScale = 1f;
+
+
     bool isGrounded = true;
     bool stepSounds = false;
 
+    
     PlayerGraphics playerGraphics;
     Rigidbody2D rb;
     //RectTransform crosshair;
@@ -45,14 +55,11 @@ public class Movement : MonoBehaviour
         {
             isGrounded = true;
             // Ensure our player sprite is normal sized again
-            playerGraphics.JumpPlayer(1f, 1f);
+            playerGraphics.JumpPlayer(originalWidth, originalHeight);
         }
 
         if (Input.GetKeyDown(KeyCode.W) && isGrounded)
         {
-            //Stretch sprite
-            float stetchHeight = 1.10f;
-            float stetchWidth = 0.90f;
             playerGraphics.JumpPlayer(stetchWidth, stetchHeight);
             //Jump the gameobject
             HandleJump();
@@ -83,14 +90,14 @@ public class Movement : MonoBehaviour
         // If ==0 we are stationary and facing our direction
         if (inputX < 0)
         {
-            playerGraphics.FlipPlayer(this.gameObject, -1f, 1f);
+            playerGraphics.FlipPlayer(gameObject, -playerOriginalScale, playerOriginalScale);
             playerGraphics.FlipPlayer(hammer, -1f, 1f);
             playerGraphics.RotateHammer(hammer, -1f);
             playerGraphics.UpdateRotate(true);
         }
         else if (inputX > 0)
         {
-            playerGraphics.FlipPlayer(this.gameObject, 1f, 1f);
+            playerGraphics.FlipPlayer(gameObject, playerOriginalScale, playerOriginalScale);
             playerGraphics.FlipPlayer(hammer, 1f, 1f);
             playerGraphics.RotateHammer(hammer, 1f);
             playerGraphics.UpdateRotate(true);
