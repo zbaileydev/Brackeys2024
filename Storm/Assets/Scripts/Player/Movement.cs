@@ -71,7 +71,7 @@ public class Movement : MonoBehaviour
         MoveHorizontal();
 
         if(Input.GetMouseButtonDown(0))
-            t.SetTile(t.WorldToCell(transform.position + Vector3.down), null);
+            t.GetComponent<WorldGenerator>().DeleteTileAt(transform.position + Vector3.down);
     }
 
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.EditorTools;
 using UnityEngine;
@@ -14,6 +15,8 @@ public class WorldGenerator : MonoBehaviour
     }
 
     Tilemap tilemap;
+    // Dictionary<Vector3Int, Tile> playerChanges = new();
+    Dictionary<Vector3, Tile> playerChanges = new();
 
     public Tile_[] tiles;
     [Tooltip("The actual size of the chunk will be twice this value")]
@@ -38,6 +41,9 @@ public class WorldGenerator : MonoBehaviour
     // [HideInInspector]
     public int xPos;
 
+    int previous_xPos;
+    bool update = true;
+
     void Start()
     {
         tilemap = GetComponent<Tilemap>();
@@ -45,21 +51,65 @@ public class WorldGenerator : MonoBehaviour
         Random.InitState(seed);
         xPos = 0;
 
+        playerChanges.Clear();
+
         // BuildWorld();
     }
 
+    public void DeleteTileAt(Vector3 pos)
+    {
+        playerChanges.Add(pos, null);
+        update = true;
+        // DeleteTile(tilemap.WorldToCell(pos));
+    }
+
+    // void DeleteTile(Vector3Int tile)
+    // {
+    //     playerChanges.Add(tile, null);
+    // }
+
+    public void ModifyTileAt(Vector3 pos, Tile newTile)
+    {
+        playerChanges.Add(pos, newTile);
+        update = true;
+        // ModifyTile(tilemap.WorldToCell(pos), newTile);
+    }
+
+    // void ModifyTile(Vector3Int tile, Tile newTile)
+    // {
+    //     playerChanges.Add(tile, newTile);
+    // }
+
     void Update()
     {
-        tilemap.ClearAllTiles();
-        transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
-        // temporary to visualize changes
-        BuildWorld();
+        if (previous_xPos != xPos)
+            update = true;
+
+        if (update){
+            tilemap.ClearAllTiles();
+            transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
+
+            BuildWorld();
+
+            previous_xPos = xPos;
+            update = false;
+        }
     }
+
 
     void BuildWorld()
     {
         CheckArguments();
-        CreateFirstLayer();
+
+        for (int x = -chunkSize; x < chunkSize; x++)
+        {
+            int noiseVal = Mathf.RoundToInt(GetNoiseVal(x));
+
+            // tilemap.SetTile(new Vector3Int(x, noiseVal), tiles[0].tile);
+            FillColumn(x, noiseVal);
+
+            // tilemap.SetTile(new Vector3Int(x, chunkBottomLimit), tiles[^1].tile);
+        }
     }
 
     void CheckArguments()
@@ -80,28 +130,25 @@ public class WorldGenerator : MonoBehaviour
             scale = Mathf.Epsilon;
     }
 
-    void CreateFirstLayer()
-    {
-        for (int x = -chunkSize; x < chunkSize; x++)
-        {
-            int noiseVal = Mathf.RoundToInt(GetNoiseVal(x));
-
-            tilemap.SetTile(new Vector3Int(x, noiseVal), tiles[0].tile);
-            FillColumn(x, noiseVal);
-
-            tilemap.SetTile(new Vector3Int(x, chunkBottomLimit), tiles[^1].tile);
-        }
-    }
-
-    void FillColumn(int x, int y)
+    void FillColumn(int x, int maxHeight)
     {
         Tile_[] _tiles = tiles.ToList().OrderBy(x => x.depth).Reverse().ToArray();
 
-        for (int i = chunkBottomLimit + 1; i < y; i++)
+        for (int y = chunkBottomLimit; y <= maxHeight; y++)
         {
-            float depth = Remap(i, chunkBottomLimit, y, 0, 1);
+            if (playerChanges.Any(v => tilemap.WorldToCell(v.Key).Equals(new Vector3Int(x, y))))
+            {
+                Tile playerChange = playerChanges.First(v => tilemap.WorldToCell(v.Key).Equals(new Vector3Int(x, y))).Value;
 
-            TileBase availableTile = tiles.ToList().FirstOrDefault(x => x.depth < depth).tile;
+                if(playerChange != null)
+                    tilemap.SetTile(new Vector3Int(x, y), playerChange);
+
+                continue;
+            }
+
+            float depth = Remap(y, chunkBottomLimit, maxHeight, 0, 1);
+
+            TileBase availableTile = tiles.ToList().FirstOrDefault(x => x.depth <= depth).tile;
             // TileBase[] availableTiles = tiles.ToList().FindAll(x => x.depth < depth).Select(x => x.tile).ToArray();
 
 
@@ -112,7 +159,7 @@ public class WorldGenerator : MonoBehaviour
             // }
 
             // int randomTile = Random.Range(0, availableTiles.Length - 1);
-            tilemap.SetTile(new Vector3Int(x, i), availableTile);
+            tilemap.SetTile(new Vector3Int(x, y), availableTile);
         }
     }
 
