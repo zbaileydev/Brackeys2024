@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LevelLoader : MonoBehaviour
-{   
+{
     //public GameObject loadingCanvas;
     private bool loadingCheck;
 
@@ -13,10 +13,11 @@ public class LevelLoader : MonoBehaviour
 
     }
 
-    public void LoadScene(int scene){
+    public void LoadScene(int scene)
+    {
         Debug.Log("Next scene index: " + scene);
         StartCoroutine(LoadAsynchronously(scene));
-	}
+    }
 
     IEnumerator LoadAsynchronously(int sceneIndex)
     {
@@ -36,7 +37,7 @@ public class LevelLoader : MonoBehaviour
             }
             yield return null;
         }
-        
+
     }
 
     public bool GetLoadingStatus()
@@ -53,8 +54,9 @@ public class LevelLoader : MonoBehaviour
     }
 
     // TODO: Remove this in the build.
-    private void Update() {
-        if (Input.GetKeyDown (KeyCode.P))
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
         {
             Debug.Log("Changing scene");
             ClickPlay();

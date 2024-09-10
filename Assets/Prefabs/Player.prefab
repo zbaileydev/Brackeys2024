@@ -436,19 +436,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 8598306330289361133}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d1ed04489c03c24d89449626feb8be5, type: 3}
+  m_Script: {fileID: 11500000, guid: 29cc9412f1193bc96aa38c4d57aae396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  t: {fileID: 0}
-  steps: {fileID: 0}
-  music: {fileID: 0}
+  worldGenerator: {fileID: 0}
   speed: 10
   jumpThrust: 15
   hammer: {fileID: 1325247163269234935}
-  stetchHeight: 1.2
-  stetchWidth: 0.5
+  stetchHeight: 1.1
+  stetchWidth: 1.05
   originalHeight: 1
-  originalWidth: 0.6
+  originalWidth: 1
 --- !u!114 &6228405285423063770
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,9 +3,10 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance {get; set;}
+    public static GameManager Instance { get; set; }
     public LevelLoader levelManager;
-    public MenuManager MenuManager; 
+    public MenuManager MenuManager;
+    public GameObject playerPrefab;
 
     public HUD hud;
     public Cycle cycle;
@@ -28,14 +29,15 @@ public class GameManager : MonoBehaviour
     so that GM only has to worry about the high level state of the game.
     */
 
-    private void Start() {
+    private void Start()
+    {
         initial = false;
         startedGame = false;
     }
 
     private void Awake()
     {
-        if(Instance != null && Instance !=this)
+        if (Instance != null && Instance != this)
         {
             Destroy(this);
         }
@@ -63,7 +65,7 @@ public class GameManager : MonoBehaviour
         {
             startedGame = true;
             initial = true;
-        }           
+        }
     }
 
     void GameCycle()
@@ -72,9 +74,9 @@ public class GameManager : MonoBehaviour
         {
             cycle.gameObject.SetActive(true);
         }
-        
+
         hud.UpdateTimerText(cycle.GetTimer());
-    
+
         if (cycle.GetTimer() < 2f)
         {
             gamePhase = cycle.GetCalmPhase();
@@ -91,5 +93,17 @@ public class GameManager : MonoBehaviour
             Debug.Log("Storm");
             initial = false;
         }
+    }
+
+    // Semirose: Not sure if this belongs here
+    public void SpawnPlayer(Vector3 pos)
+    {
+        var players = FindObjectsOfType<PlayerMovement>();
+        if (players.Length != 0)
+            foreach (var player in players)
+                Destroy(player.gameObject);
+
+        GameObject newPlayer = Instantiate(playerPrefab, pos, Quaternion.identity);
+        Camera.main.GetComponent<CameraFollow>().target = newPlayer.transform;
     }
 }
