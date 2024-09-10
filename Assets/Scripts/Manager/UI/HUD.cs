@@ -12,10 +12,11 @@ public class HUD : MonoBehaviour
     [Tooltip("Player Health")]
     public TMP_Text health;
     [Tooltip("Primary weapon")]
-    public TMP_Text item1;
+    public TMP_Text weapon;
     [Tooltip("Tool")]
-    public TMP_Text item2;
+    public TMP_Text tool;
 
+    // Converts float to string for the text display.
     public void UpdateTimerText(float newTime)
     {
         if (timer != null) 
@@ -31,13 +32,14 @@ public class HUD : MonoBehaviour
         if (health != null) health.text = newHealth;
     }
 
-    public void UpdateItem1Text(string newItem1)
+    // We might want to update an image next to the items.
+    public void UpdateWeaponText(string newWeapon)
     {
-        if (item1 != null) item1.text = newItem1;
+        if (weapon != null) weapon.text = newWeapon;
     }
 
-    public void UpdateItem2Text(string newItem2)
+    public void UpdateToolText(string newTool)
     {
-        if (item2 != null) item2.text = newItem2;
+        if (tool != null) tool.text = newTool;
     }
 }

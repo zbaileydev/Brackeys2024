@@ -10,12 +10,7 @@ public class Cycle : MonoBehaviour
 
     private bool isCalmPhase = true;
     private float currentTime = 0;
-    
-    void Start()
-    {
-        StartCoroutine(CountdownCycle());
-    }
-    
+       
     IEnumerator CountdownCycle()
     {
         while (true)
@@ -44,9 +39,20 @@ public class Cycle : MonoBehaviour
         }
     }
 
+    public void Start()
+    {
+        StartCoroutine(CountdownCycle());
+    }
+
     public float GetTimer()
     {
         return currentTime;
+    }
+
+    // Initial way of telling game manager what phase we are in.
+    public bool GetCalmPhase()
+    {
+        return isCalmPhase;
     }
 
    

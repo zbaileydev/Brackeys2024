@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Storm.sln"
+    "dotnet.defaultSolution": "Brackeys2024.sln"
 }

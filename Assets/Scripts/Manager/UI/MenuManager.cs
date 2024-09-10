@@ -16,6 +16,7 @@ public class MenuManager : MonoBehaviour
     public GameObject optionsMenu;
     public GameObject creditsMenu;
     public GameObject mainMenu;
+    public GameObject HUDMenu;
 
     [Header("Transitions")]
     public Animator animator;
@@ -46,7 +47,7 @@ public class MenuManager : MonoBehaviour
     }
 
     // Toggling all panels besides the one passed in.
-    public void PanelSwitch(GameObject activePanel)
+    public void PanelSwitch(GameObject activePanel, bool hudCondition = true)
     {
         foreach (var panel in panels)
         {
@@ -56,7 +57,9 @@ public class MenuManager : MonoBehaviour
             }
             
         }
-        activePanel.SetActive(true);
+        // Disable all panels for the loading screen
+        // before we render the HUD.
+        if (!hudCondition) activePanel.SetActive(true);
     }
 
     // Determine if we are returning to the main menu 
@@ -169,7 +172,26 @@ public class MenuManager : MonoBehaviour
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = currentSceneIndex + 1;
         levelLoader.LoadScene(nextSceneIndex);
-        gameObject.SetActive(false);
+        PanelSwitch(HUDMenu, false);
+        StartCoroutine(StartHUD());
+    }
+
+    IEnumerator StartHUD()
+    {
+        // The main issue is beach generation takes multiple seconds
+        // so waiting for the level to load reduces the calm period
+        // need to add an event for when generation finishes.
+        while (levelLoader == null)
+        {
+            yield return new WaitForSeconds(1f);
+        }
+
+        while (!levelLoader.GetLoadingStatus())
+        {
+            yield return new WaitForSeconds(1f);
+        }
+        
+        PanelSwitch(HUDMenu);
     }
 
 }
