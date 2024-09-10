@@ -15,11 +15,11 @@ public class Movement : MonoBehaviour
     //public Image reticleImage;
     public GameObject hammer;
 
-    public float stetchHeight = 0.6f;
-    public float stetchWidth = 0.25f;
+    public float stetchHeight = 1.1f;
+    public float stetchWidth = 1.05f;
 
-    public float originalHeight = 0.5f;
-    public float originalWidth = 0.3f;
+    public float originalHeight = 1.0f;
+    public float originalWidth = 1.0f;
 
     private float playerOriginalScale = 1f;
 
