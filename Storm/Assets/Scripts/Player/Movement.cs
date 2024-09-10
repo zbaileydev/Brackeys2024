@@ -7,8 +7,6 @@ using UnityEngine.Tilemaps;
 public class Movement : MonoBehaviour
 {
     public WorldGenerator worldGenerator;
-    public AudioSource steps;
-    public AudioSource music;
 
     public float speed = 10f;
     public float jumpThrust = 15f;
@@ -28,12 +26,14 @@ public class Movement : MonoBehaviour
 
     PlayerGraphics playerGraphics;
     Rigidbody2D rb;
+    AudioManager am;
     //RectTransform crosshair;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         playerGraphics = GetComponent<PlayerGraphics>();
+        am = AudioManager.instance;
         //crosshair = reticleImage.GetComponent<RectTransform>();
         //music.Play();
     }
@@ -81,14 +81,12 @@ public class Movement : MonoBehaviour
         transform.Translate(movement);
 
         worldGenerator.xPos = Mathf.RoundToInt(transform.position.x);
-        /*
-        // Only play SFX if we are moving and havent already started the SFX
-        if (inputX != 0 && !stepSounds)
+        
+        if (inputX != 0 && !stepSounds && isGrounded)
         {
-            steps.Play();
+            am.PlayClip(am.footstepSFX, am.footstepSFXVolume, true); //Play the footsteps indefinitely (LOOP).
             stepSounds = true;
         }
-        */
 
         // If ==0 we are stationary and facing our direction
         if (inputX < 0)
@@ -109,8 +107,8 @@ public class Movement : MonoBehaviour
         {
             // No rotation at all if we are not moving
             playerGraphics.UpdateRotate(false);
-            //steps.Stop();
-            //stepSounds = false;
+            am.PauseClip(am.footstepSFX);
+            stepSounds = false;
         }
 
     }
@@ -118,6 +116,7 @@ public class Movement : MonoBehaviour
     void HandleJump()
     {
         rb.AddForce(transform.up * jumpThrust, ForceMode2D.Impulse);
+        am.PauseClip(am.footstepSFX);
     }
 
     void OnCollisionEnter2D(Collision2D other)
