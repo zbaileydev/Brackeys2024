@@ -10,6 +10,29 @@ public class GameManager : MonoBehaviour
     public HUD hud;
     public Cycle cycle;
 
+    private bool startedGame;
+    private bool gamePhase;
+    private bool initial;
+
+    /*
+    Game Manager flow
+    MenuManager calls levelManager when Play is pressed.
+    When the demo scene is loaded in, MenuManager activates the HUD.
+    Once the HUD is active, GameManager starts the game
+    and turns on the CycleManager.
+
+    GM then facilitates updating the HUD based on the CycleManager.
+
+    We will likely rename CycleManager to StormManager
+    and have it manage an EnemySpawner and other affects
+    so that GM only has to worry about the high level state of the game.
+    */
+
+    private void Start() {
+        initial = false;
+        startedGame = false;
+    }
+
     private void Awake()
     {
         if(Instance != null && Instance !=this)
@@ -23,12 +46,50 @@ public class GameManager : MonoBehaviour
         }
         DontDestroyOnLoad(gameObject);
         DontDestroyOnLoad(levelManager.gameObject);
+        DontDestroyOnLoad(MenuManager.gameObject);
+        DontDestroyOnLoad(cycle.gameObject);
     }
 
     public void Update()
     {
-        hud.UpdateTimerText(cycle.GetTimer());
+        if (startedGame)
+        {
+            GameCycle();
+        }
+
+        // If our HUD is enabled, we are in the game
+        // so kick off the game cycle and the loop.
+        if (hud.gameObject.activeInHierarchy == true)
+        {
+            startedGame = true;
+            initial = true;
+        }           
     }
 
+    void GameCycle()
+    {
+        if (cycle.gameObject.activeInHierarchy == false)
+        {
+            cycle.gameObject.SetActive(true);
+        }
+        
+        hud.UpdateTimerText(cycle.GetTimer());
     
+        if (cycle.GetTimer() < 2f)
+        {
+            gamePhase = cycle.GetCalmPhase();
+            initial = true;
+        }
+
+        if (gamePhase && initial)
+        {
+            Debug.Log("Calm");
+            initial = false;
+        }
+        else if (initial)
+        {
+            Debug.Log("Storm");
+            initial = false;
+        }
+    }
 }

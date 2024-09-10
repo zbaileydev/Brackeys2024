@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class LevelLoader : MonoBehaviour
 {   
-    public MenuManager menuManager;
     //public GameObject loadingCanvas;
+    private bool loadingCheck;
 
     public void StartLevelAnimation()
     {
@@ -15,7 +15,6 @@ public class LevelLoader : MonoBehaviour
 
     public void LoadScene(int scene){
         Debug.Log("Next scene index: " + scene);
-        //menuManager.PanelSwitch(loadingCanvas);
         StartCoroutine(LoadAsynchronously(scene));
 	}
 
@@ -33,10 +32,16 @@ public class LevelLoader : MonoBehaviour
                 //loadingCanvas.SetActive(false);
                 //GameManager.Instance.levelManager.StartGame();
                 loading.allowSceneActivation = true;
+                loadingCheck = true;
             }
             yield return null;
         }
         
+    }
+
+    public bool GetLoadingStatus()
+    {
+        return loadingCheck;
     }
 
     public void ClickPlay()
