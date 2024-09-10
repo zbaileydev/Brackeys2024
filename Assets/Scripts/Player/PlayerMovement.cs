@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 
-public class Movement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     public WorldGenerator worldGenerator;
 
@@ -66,7 +66,7 @@ public class Movement : MonoBehaviour
         // Function to handle our X-axis movement
         MoveHorizontal();
 
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
             worldGenerator.DeleteTileAt(transform.position + Vector3.down);
     }
 
@@ -81,7 +81,7 @@ public class Movement : MonoBehaviour
         transform.Translate(movement);
 
         worldGenerator.xPos = Mathf.RoundToInt(transform.position.x);
-        
+
         if (inputX != 0 && !stepSounds && isGrounded)
         {
             am.PlayClip(am.footstepSFX, am.footstepSFXVolume, true); //Play the footsteps indefinitely (LOOP).
@@ -130,7 +130,7 @@ public class Movement : MonoBehaviour
         //                      TEMPORARY
         // TODO: Move to new script that handles loot and inventory ||
         //                                                          \/
-        if(other.gameObject.CompareTag("Loot Container"))
+        if (other.gameObject.CompareTag("Loot Container"))
         {
             string item = other.gameObject.GetComponent<ILootContainer>().GetLoot();
             if (item != string.Empty)
