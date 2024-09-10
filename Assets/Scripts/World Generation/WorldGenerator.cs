@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -8,7 +9,7 @@ public class WorldGenerator : MonoBehaviour
     [System.Serializable]
     public struct LayerTile
     {
-        public Tile tile;
+        public TileBase tile;
         [Range(0, 1)]
         public float depth;
     }
@@ -44,8 +45,8 @@ public class WorldGenerator : MonoBehaviour
     public float lacunarity = 1;
     public Vector2Int offset = Vector2Int.zero;
     public Tilemap featuresTilemap;
+    public Tilemap groundTilemap;
 
-    Tilemap groundTilemap;
     Dictionary<Vector3, Tile> playerChanges = new();
     Dictionary<Vector3Int, Tile> featuresLayer = new();
     // [HideInInspector]
@@ -58,7 +59,6 @@ public class WorldGenerator : MonoBehaviour
 
     void Start()
     {
-        groundTilemap = GetComponent<Tilemap>();
         Random.InitState(seed);
         xPos = 0;
 
@@ -106,7 +106,7 @@ public class WorldGenerator : MonoBehaviour
     {
         featuresTilemap.ClearAllTiles();
         groundTilemap.ClearAllTiles();
-        transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
+        groundTilemap.transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
         previous_xPos = xPos;
 
         CheckArguments();
@@ -160,9 +160,17 @@ public class WorldGenerator : MonoBehaviour
 
             float depth = Remap(y, chunkBottomLimit, maxHeight, 0, 1);
 
-            TileBase availableTile = tiles.ToList().FirstOrDefault(x => x.depth <= depth).tile;
+            var firstOption = tiles.ToList().FirstOrDefault(x => x.depth <= depth);
+            List<TileBase> availableTiles = new()
+            {
+                firstOption.tile
+            };
+            availableTiles.AddRange(tiles.ToList().FindAll(x => x.depth == firstOption.depth).Select(x => x.tile));
 
-            groundTilemap.SetTile(new Vector3Int(x, y), availableTile);
+            var worldpos = Vector3Int.FloorToInt(groundTilemap.CellToWorld(new Vector3Int(x, y)));
+
+            System.Random rng = new(seed + worldpos.GetHashCode());
+            groundTilemap.SetTile(new Vector3Int(x, y), availableTiles[rng.Next(availableTiles.Count)]);
         }
     }
 
