@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,127 +6,106 @@ using UnityEngine.Tilemaps;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public Action OnPlayerJump;
+    //           movement, position, velocity
+    public Action<Vector3, Vector3, Vector3> OnPlayerMove;
+    public Action OnPlayerLand;
+
     public WorldGenerator worldGenerator;
-
-    public float speed = 10f;
+    public Transform[] groundChecks;
+    public LayerMask groundLayer;
+    public float movementSpeed = 10f;
     public float jumpThrust = 15f;
-    //public Image reticleImage;
-    public GameObject hammer;
+    public bool airControl = true;
 
-    public float stetchHeight = 1.1f;
-    public float stetchWidth = 1.05f;
-
-    public float originalHeight = 1.0f;
-    public float originalWidth = 1.0f;
-
-    private float playerOriginalScale = 1f;
-
+    float groundCheckRadius = 0.1f;
     bool isGrounded = true;
     bool stepSounds = false;
+    bool jump = false;
+    Vector3 velocity;
+    Vector3 movement;
 
-    PlayerGraphics playerGraphics;
     Rigidbody2D rb;
     AudioManager am;
-    //RectTransform crosshair;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        playerGraphics = GetComponent<PlayerGraphics>();
         am = AudioManager.instance;
-        //crosshair = reticleImage.GetComponent<RectTransform>();
-        //music.Play();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            Application.Quit();
-        }
-        // We need to cap the pos within the player's mining range
-        //Vector3 mousePos = Input.mousePosition;
-        //Vector3 editedPos = new Vector3(mousePos.x, mousePos.y, 0);
-        //crosshair.anchoredPosition = editedPos;
+        if (Input.GetKeyDown(KeyCode.P)) Application.Quit();
 
-        if (rb.velocity.y == 0)
-        {
-            isGrounded = true;
-            // Ensure our player sprite is normal sized again
-            playerGraphics.JumpPlayer(originalWidth, originalHeight);
-        }
+        // if (rb.velocity.y <= 0.01f && !isGrounded)
+        // {
+        //     isGrounded = true;
+        //     OnPlayerLand?.Invoke();
+        // }
 
-        if (Input.GetKeyDown(KeyCode.W) && isGrounded)
+        List<Collider2D> colliders = new();
+        foreach (var check in groundChecks)
+            colliders.AddRange(Physics2D.OverlapCircleAll(check.position, groundCheckRadius, groundLayer));
+
+        for (int i = 0; i < colliders.Count; i++)
+            if (colliders[i].gameObject != gameObject)
+                isGrounded = true;
+
+        if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            playerGraphics.JumpPlayer(stetchWidth, stetchHeight);
-            //Jump the gameobject
-            HandleJump();
             isGrounded = false;
+            OnPlayerJump?.Invoke();
+            jump = true;
+            am.PauseClip(am.footstepSFX);
         }
-        // Function to handle our X-axis movement
-        MoveHorizontal();
+
+        float inputX = Input.GetAxis("Horizontal");
+        movement = new Vector3(movementSpeed * inputX, 0);
 
         if (Input.GetMouseButtonDown(0))
             worldGenerator.DeleteTileAt(transform.position + Vector3.down);
     }
 
+    void FixedUpdate()
+    {
+        MoveHorizontal();
+    }
+
 
     void MoveHorizontal()
     {
-        // Get our X input and translate it into movement based on frames
-        float inputX = Input.GetAxis("Horizontal");
-        Vector3 movement = new Vector3(speed * inputX, 0, 0);
-        movement *= Time.deltaTime;
-        // Move the player gameobject based on the X input 
-        transform.Translate(movement);
+        transform.Translate(movement * Time.deltaTime);
 
-        worldGenerator.xPos = Mathf.RoundToInt(transform.position.x);
+        OnPlayerMove?.Invoke(movement, transform.position, rb.velocity);
 
-        if (inputX != 0 && !stepSounds && isGrounded)
+        if (movement.x != 0 && isGrounded && !stepSounds)
         {
             am.PlayClip(am.footstepSFX, am.footstepSFXVolume, true); //Play the footsteps indefinitely (LOOP).
             stepSounds = true;
         }
 
-        // If ==0 we are stationary and facing our direction
-        if (inputX < 0)
+        // if (isGrounded || airControl)
+        // {
+        //     Vector3 targetVelocity = movement + Vector3.up * rb.velocity.y;
+        //     rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, movementSmoothing);
+        // }
+        if (isGrounded && jump)
         {
-            playerGraphics.FlipPlayer(gameObject, -playerOriginalScale, playerOriginalScale);
-            playerGraphics.FlipPlayer(hammer, -1f, 1f);
-            playerGraphics.RotateHammer(hammer, -1f);
-            playerGraphics.UpdateRotate(true);
+            rb.AddForce(Vector3.up * jumpThrust, ForceMode2D.Impulse);
+            jump = false;
         }
-        else if (inputX > 0)
+
+        if (movement.x == 0)
         {
-            playerGraphics.FlipPlayer(gameObject, playerOriginalScale, playerOriginalScale);
-            playerGraphics.FlipPlayer(hammer, 1f, 1f);
-            playerGraphics.RotateHammer(hammer, 1f);
-            playerGraphics.UpdateRotate(true);
-        }
-        else if (inputX == 0)
-        {
-            // No rotation at all if we are not moving
-            playerGraphics.UpdateRotate(false);
             am.PauseClip(am.footstepSFX);
             stepSounds = false;
         }
 
     }
 
-    void HandleJump()
-    {
-        rb.AddForce(transform.up * jumpThrust, ForceMode2D.Impulse);
-        am.PauseClip(am.footstepSFX);
-    }
-
     void OnCollisionEnter2D(Collision2D other)
     {
-        // Some backup checking in case our velocity is clipped on something
-        if (other.gameObject.CompareTag("Floor") && !isGrounded)
-        {
-            isGrounded = true;
-        }
-
         //                      TEMPORARY
         // TODO: Move to new script that handles loot and inventory ||
         //                                                          \/
