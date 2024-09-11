@@ -25,10 +25,14 @@ public class WorldGenerator : MonoBehaviour
     }
 
     public LayerTile[] tiles;
+    public FeatureTile[] features;
+    public Tile slopeRight;
+    public Tile belowSlopeRight;
+    public Tile slopeLeft;
+    public Tile belowSlopeLeft;
     [Tooltip("The actual size of the chunk will be twice this value")]
     public int chunkSize = 25;
     public int chunkBottomLimit = -15;
-    public FeatureTile[] features;
     [Space]
     [Header("Noise Variables")]
     public int seed;
@@ -120,6 +124,7 @@ public class WorldGenerator : MonoBehaviour
             FillColumn(x, noiseVal);
         }
 
+        heightMap = AddSlopes(heightMap);
         if (updateFeatures)
             PlaceFeatures(heightMap);
     }
@@ -172,6 +177,34 @@ public class WorldGenerator : MonoBehaviour
             System.Random rng = new(seed + worldpos.GetHashCode());
             groundTilemap.SetTile(new Vector3Int(x, y), availableTiles[rng.Next(availableTiles.Count)]);
         }
+    }
+
+    int[] AddSlopes(int[] heightMap)
+    {
+        for (int x = 1, lastHeight = heightMap[0]; x < 2 * chunkSize; x++)
+        {
+            int currentHeight = heightMap[x];
+            if (currentHeight < lastHeight)
+            {
+                heightMap[x] = lastHeight;
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize, lastHeight))))
+                    groundTilemap.SetTile(new Vector3Int(x - chunkSize, lastHeight), slopeLeft);
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize, currentHeight))))
+                    groundTilemap.SetTile(new Vector3Int(x - chunkSize, currentHeight), belowSlopeLeft);
+            }
+            else if (currentHeight > lastHeight)
+            {
+                heightMap[x - 1] = currentHeight;
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize - 1, currentHeight))))
+                    groundTilemap.SetTile(new Vector3Int(x - chunkSize - 1, currentHeight), slopeRight);
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize - 1, lastHeight))))
+                    groundTilemap.SetTile(new Vector3Int(x - chunkSize - 1, lastHeight), belowSlopeRight);
+            }
+
+            lastHeight = currentHeight;
+        }
+
+        return heightMap;
     }
 
     void PlaceFeatures(int[] heightMap)
