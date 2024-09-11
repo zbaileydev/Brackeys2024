@@ -427,6 +427,7 @@ MonoBehaviour:
     depth: 0
   chunkSize: 22
   chunkBottomLimit: -8
+  features: []
   seed: 0
   octaves: 2
   amplitude: 20
@@ -434,6 +435,8 @@ MonoBehaviour:
   frequency: 2.5
   lacunarity: 0.5
   offset: {x: 0, y: -4}
+  featuresTilemap: {fileID: 0}
+  groundTilemap: {fileID: 0}
   xPos: 0
 --- !u!19719996 &318789429
 TilemapCollider2D:
@@ -1666,8 +1669,68 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3988550768629067163, guid: 46ee898f436695747977cd48b13e155a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6966879676299801084}
+    - targetCorrespondingSourceObject: {fileID: 3988550768629067163, guid: 46ee898f436695747977cd48b13e155a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6966879676299801083}
   m_SourcePrefab: {fileID: 100100000, guid: 46ee898f436695747977cd48b13e155a, type: 3}
+--- !u!1 &6966879676299801082 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3988550768629067163, guid: 46ee898f436695747977cd48b13e155a, type: 3}
+  m_PrefabInstance: {fileID: 6966879676299801081}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6966879676299801083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6966879676299801082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: 
+  EventReference:
+    Guid:
+      Data1: -587431915
+      Data2: 1175217117
+      Data3: 544347839
+      Data4: 288910236
+    Path: event:/Start
+  Event: 
+  PlayEvent: 1
+  StopEvent: 2
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  NonRigidbodyVelocity: 0
+  Params: []
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
+--- !u!114 &6966879676299801084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6966879676299801082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9468c5f457ace64f8d4df6d642b107f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LoadEvent: 1
+  UnloadEvent: 2
+  Banks:
+  - World
+  CollisionTag: 
+  PreloadSamples: 0
 --- !u!1001 &8379837533580648155
 PrefabInstance:
   m_ObjectHideFlags: 0
