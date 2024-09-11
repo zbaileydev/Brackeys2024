@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: Depth 1_var1
+  m_Name: Surface
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: -1343793853, guid: 1658adcf59ee06ad89d8c06a45f5651a, type: 3}
+  m_Sprite: {fileID: -652417761, guid: f69a225d86c8d0d45b8f2f8f7d51be93, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
