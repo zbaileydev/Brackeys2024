@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Tilemaps;
 
 public class WorldGenerator : MonoBehaviour
@@ -18,15 +19,27 @@ public class WorldGenerator : MonoBehaviour
     public struct FeatureTile
     {
         public Tile tile;
+        // TODO: implement
         [Tooltip("A spawn chance of 0 will spawn only once when the world is created at the spawn point.")]
         [Range(0, 1)]
         public float spawnChance;
         public uint width;
     }
 
+    [System.Serializable]
+    public struct LootContainer
+    {
+        public GameObject containerPrefab;
+        public LootTable[] lootTables;
+        [Range(0, 1)]
+        public float spawnChance;
+        public bool buried;
+    }
+
     public GameObject playerObject;
     public LayerTile[] tiles;
     public FeatureTile[] features;
+    public LootContainer[] lootContainers;
     public Tile slopeRight;
     public Tile belowSlopeRight;
     public Tile slopeLeft;
@@ -34,6 +47,7 @@ public class WorldGenerator : MonoBehaviour
     [Tooltip("The actual size of the chunk will be twice this value")]
     public int chunkSize = 25;
     public int chunkBottomLimit = -15;
+    public int minSpaceBetweenLootContainers = 10;
     [Space]
     [Header("Noise Variables")]
     public int seed;
@@ -52,14 +66,18 @@ public class WorldGenerator : MonoBehaviour
     public Tilemap featuresTilemap;
     public Tilemap groundTilemap;
 
-    Dictionary<Vector3, Tile> playerChanges = new();
+    List<Vector3> playerChanges = new();
+    List<int> regionsWithLoot = new();
     Dictionary<Vector3Int, Tile> featuresLayer = new();
+    // Dictionary<int, (Vector3, GameObject)> lootContainersHolder = new();
     // [HideInInspector]
     public int xPos;
     int previous_xPos;
     bool update = true;
     int previousFeatures_xPos;
+    int previousLoot_xPos;
     bool updateFeatures = true;
+    bool updateLoot = true;
     int[] heightMap;
 
     void Start()
@@ -74,21 +92,21 @@ public class WorldGenerator : MonoBehaviour
 
     public void DeleteTileAt(Vector3 pos)
     {
-        if (!playerChanges.Any(x => x.Key.Equals(pos)))
+        if (!playerChanges.Any(x => x.Equals(pos)))
         {
-            playerChanges.Add(pos, null);
+            playerChanges.Add(pos);
             update = true;
         }
     }
 
-    public void ModifyTileAt(Vector3 pos, Tile newTile)
-    {
-        if (!playerChanges.Any(x => x.Key.Equals(pos)))
-        {
-            playerChanges.Add(pos, newTile);
-            update = true;
-        }
-    }
+    // public void ModifyTileAt(Vector3 pos, Tile newTile)
+    // {
+    //     if (!playerChanges.Any(x => x.Key.Equals(pos)))
+    //     {
+    //         playerChanges.Add(pos, newTile);
+    //         update = true;
+    //     }
+    // }
 
     void Update()
     {
@@ -100,9 +118,15 @@ public class WorldGenerator : MonoBehaviour
             previousFeatures_xPos = xPos;
         }
 
-        if (update || updateFeatures)
+        if (Mathf.Abs(previousLoot_xPos - xPos) >= minSpaceBetweenLootContainers)
         {
-            BuildWorld(updateFeatures);
+            updateLoot = true;
+            previousLoot_xPos = xPos;
+        }
+
+        if (update || updateFeatures || updateLoot)
+        {
+            BuildWorld();
             update = false;
             updateFeatures = false;
         }
@@ -110,9 +134,9 @@ public class WorldGenerator : MonoBehaviour
 
     void OnPlayerMove(Vector3 movement, Vector3 position, Vector3 velocity) => xPos = Mathf.RoundToInt(position.x);
 
-    void BuildWorld(bool updateFeatures)
+    void BuildWorld()
     {
-        featuresTilemap.ClearAllTiles();
+        // featuresTilemap.ClearAllTiles();
         groundTilemap.ClearAllTiles();
         groundTilemap.transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
         previous_xPos = xPos;
@@ -128,9 +152,12 @@ public class WorldGenerator : MonoBehaviour
             FillColumn(x, noiseVal);
         }
 
-        heightMap = AddSlopes(heightMap);
         if (updateFeatures)
             PlaceFeatures(heightMap);
+
+        heightMap = AddSlopes(heightMap);
+        if (updateLoot)
+            PlaceLoot(heightMap);
     }
 
     void CheckArguments()
@@ -157,15 +184,13 @@ public class WorldGenerator : MonoBehaviour
 
         for (int y = chunkBottomLimit; y <= maxHeight; y++)
         {
-            if (playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x, y))))
-            {
-                Tile playerChange = playerChanges.First(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x, y))).Value;
-
-                if (playerChange != null)
-                    groundTilemap.SetTile(new Vector3Int(x, y), playerChange);
-
+            if (playerChanges.Any(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x, y))))
                 continue;
-            }
+            // {
+            //     Tile playerChange = playerChanges.First(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x, y))).Value;
+            //     if (playerChange != null)
+            //         groundTilemap.SetTile(new Vector3Int(x, y), playerChange);
+            // }
 
             float depth = Remap(y, chunkBottomLimit, maxHeight, 0, 1);
 
@@ -191,17 +216,17 @@ public class WorldGenerator : MonoBehaviour
             if (currentHeight < lastHeight)
             {
                 heightMap[x] = lastHeight;
-                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize, lastHeight))))
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x - chunkSize, lastHeight))))
                     groundTilemap.SetTile(new Vector3Int(x - chunkSize, lastHeight), slopeLeft);
-                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize, currentHeight))))
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x - chunkSize, currentHeight))))
                     groundTilemap.SetTile(new Vector3Int(x - chunkSize, currentHeight), belowSlopeLeft);
             }
             else if (currentHeight > lastHeight)
             {
                 heightMap[x - 1] = currentHeight;
-                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize - 1, currentHeight))))
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x - chunkSize - 1, currentHeight))))
                     groundTilemap.SetTile(new Vector3Int(x - chunkSize - 1, currentHeight), slopeRight);
-                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize - 1, lastHeight))))
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x - chunkSize - 1, lastHeight))))
                     groundTilemap.SetTile(new Vector3Int(x - chunkSize - 1, lastHeight), belowSlopeRight);
             }
 
@@ -213,25 +238,30 @@ public class WorldGenerator : MonoBehaviour
 
     void PlaceFeatures(int[] heightMap)
     {
-        for (int x = 0, flatSize; x < 2 * chunkSize - 1; x += flatSize)
+        for (int x = -chunkSize, flatSize; x < chunkSize - 1; x += flatSize)
         {
-            Vector3Int currentCellPos = featuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x] + 1)));
-            if (featuresLayer.Any(v => v.Key.Equals(currentCellPos)))
-                break;
-
             flatSize = 1;
-            for (int i = x + 1, j = 1; i < 2 * chunkSize; i++, j++)
+            Vector3Int currentCellPos = featuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + chunkSize] + 1)));
+            if (featuresLayer.Any(v => v.Key.Equals(currentCellPos)))
+            {
+                // Tile feature = featuresLayer.First(v => v.Key.Equals(currentCellPos)).Value;
+                // if (feature != null)
+                //     featuresTilemap.SetTile(currentCellPos, feature);
+                continue;
+            }
+
+            for (int i = x + 1, j = 1; i < chunkSize; i++, j++)
             {
                 if (featuresLayer.Any(v => v.Key.Equals(new Vector3Int(currentCellPos.x + j, currentCellPos.y))))
                     break;
 
-                if (heightMap[i] == heightMap[x])
+                if (heightMap[i + chunkSize] == heightMap[x + chunkSize])
                     flatSize++;
                 else
                     break;
             }
 
-            FeatureTile[] potentialFeatures = features.ToList().FindAll(v => v.width <= flatSize).OrderBy(v => v.width).ToArray();
+            FeatureTile[] potentialFeatures = features.ToList().FindAll(v => v.width <= flatSize).OrderBy(v => v.width).Reverse().ToArray();
             if (potentialFeatures.Length == 0)
             {
                 for (int i = 0; i < flatSize; i++)
@@ -239,10 +269,11 @@ public class WorldGenerator : MonoBehaviour
                 continue;
             }
 
-            System.Random rng = new(seed + xPos);
-            float chance = (float)rng.NextDouble();
+            float chance = Random.value;
+            if (chance <= 0.242 && flatSize >= 8)
+                Debug.Log(chance);
 
-            potentialFeatures = potentialFeatures.ToList().FindAll(v => v.spawnChance > chance).ToArray();
+            potentialFeatures = potentialFeatures.ToList().FindAll(v => v.spawnChance >= chance).ToArray();
             if (potentialFeatures.Length == 0)
             {
                 for (int i = 0; i < flatSize; i++)
@@ -250,12 +281,79 @@ public class WorldGenerator : MonoBehaviour
                 continue;
             }
 
-            Tile selectedFeature = potentialFeatures[rng.Next(potentialFeatures.Length)].tile;
+            Tile selectedFeature = potentialFeatures[0].tile;
             featuresTilemap.SetTile(currentCellPos, selectedFeature);
 
             featuresLayer.Add(currentCellPos, selectedFeature);
             for (int i = 1; i < flatSize; i++)
                 featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y), null);
+        }
+    }
+
+    void PlaceLoot(int[] heightMap)
+    {
+        for (int x = -chunkSize; x < chunkSize; x += minSpaceBetweenLootContainers)
+        {
+            int currentRegion = Mathf.FloorToInt((float)(x + xPos) / minSpaceBetweenLootContainers);
+            if (regionsWithLoot.Contains(currentRegion))
+                continue;
+
+            System.Random rng = new(seed + currentRegion);
+            // (Vector3 pos, GameObject container) = lootContainersHolder[currentRegion];
+            // Instantiate(container, pos, Quaternion.identity, transform);
+
+            if (rng.NextDouble() > 0.4)
+            {
+                regionsWithLoot.Add(currentRegion);
+                continue;
+            }
+
+            // Surface
+            {
+                LootContainer[] surfaceContainers = lootContainers.ToList().FindAll(x => !x.buried).ToArray();
+
+                float chance = (float)rng.NextDouble();
+                LootContainer[] potentialContainers = surfaceContainers.ToList().FindAll(x => x.spawnChance > chance).ToArray();
+
+                if (potentialContainers.Length != 0)
+                {
+                    Vector3 worldPos = groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + chunkSize] + 1));
+
+                    DeleteTileAt(worldPos);
+                    groundTilemap.SetTile(new Vector3Int(x, heightMap[x + chunkSize]), null);
+
+                    int random = Random.Range(0, potentialContainers.Length);
+                    GameObject container = Instantiate(potentialContainers[random].containerPrefab, worldPos + groundTilemap.tileAnchor, Quaternion.identity, transform);
+                    container.GetComponent<LootChest>().lootTable = potentialContainers[random].lootTables[Random.Range(0, potentialContainers[random].lootTables.Length)];
+
+                    regionsWithLoot.Add(currentRegion);
+                    continue;
+                }
+            }
+
+            // Buried
+            {
+                LootContainer[] buriedContainers = lootContainers.ToList().FindAll(x => x.buried).ToArray();
+
+                float chance = (float)rng.NextDouble();
+                LootContainer[] potentialContainers = buriedContainers.ToList().FindAll(x => x.spawnChance > chance).ToArray();
+
+                if (potentialContainers.Length == 0)
+                    continue;
+
+                int yPos = Random.Range(chunkBottomLimit + 5, heightMap[x + chunkSize] - 3);
+                Vector3 worldPos = groundTilemap.CellToWorld(new Vector3Int(x, yPos));
+
+                DeleteTileAt(worldPos);
+                groundTilemap.SetTile(new Vector3Int(x, yPos), null);
+
+                int random = Random.Range(0, potentialContainers.Length);
+                GameObject container = Instantiate(potentialContainers[random].containerPrefab, worldPos + groundTilemap.tileAnchor, Quaternion.identity, transform);
+                container.GetComponent<LootChest>().lootTable = potentialContainers[random].lootTables[Random.Range(0, potentialContainers[random].lootTables.Length)];
+
+                regionsWithLoot.Add(currentRegion);
+                break;
+            }
         }
     }
 

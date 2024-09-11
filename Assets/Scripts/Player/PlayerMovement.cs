@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Tilemaps;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -22,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     bool isGrounded = true;
     bool stepSounds = false;
     bool jump = false;
-    Vector3 velocity;
+    // Vector3 velocity;
     Vector3 movement;
 
     Rigidbody2D rb;
@@ -60,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
             //am.PauseClip(am.footstepSFX);
         }
 
-        float inputX = Input.GetAxis("Horizontal");
+        float inputX = Input.GetAxisRaw("Horizontal");
         movement = new Vector3(movementSpeed * inputX, 0);
 
         if (Input.GetMouseButtonDown(0))
@@ -71,7 +69,6 @@ public class PlayerMovement : MonoBehaviour
     {
         MoveHorizontal();
     }
-
 
     void MoveHorizontal()
     {
