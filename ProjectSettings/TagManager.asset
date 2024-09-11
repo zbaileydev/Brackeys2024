@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Loot Container
   - Floor
+  - Loot
   layers:
   - Default
   - TransparentFX
@@ -13,8 +14,8 @@ TagManager:
   - 
   - Water
   - UI
-  - Player
-  - Interactable
+  - Environment
+  - Post Processing
   - 
   - 
   - 

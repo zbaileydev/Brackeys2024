@@ -1,13 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using UnityEditor.EditorTools;
 using UnityEngine;
+using TMPro;
 
 public class HUD : MonoBehaviour
 {
-
-    [Tooltip("Calm/Storm Timer")]
+     [Tooltip("Calm/Storm Timer")]
     public TMP_Text timer;
     [Tooltip("Player Health")]
     public TMP_Text health;

@@ -25,13 +25,13 @@ public class LootChest : MonoBehaviour, ILootContainer
         // gives >= 0.8 most of the time, very hard.
         // float random = 1 - Mathf.Pow(Random.value, 2);
         float random = Random.value;
-        Debug.Log(random.ToString());
+        //Debug.Log(random.ToString());
 
         string[] items = lootTable.lootTable.ToList().FindAll(x => x.chance >= random).OrderBy(x => x.chance).Select(x => x.item).ToArray();
-        Debug.Log(items.Length);
+        //Debug.Log(items.Length);
         if(items.Length == 0)
         {
-            Debug.Log("Returned default item");
+            //Debug.Log("Returned default item");
             return lootTable.defaultItem.item;
         }
 

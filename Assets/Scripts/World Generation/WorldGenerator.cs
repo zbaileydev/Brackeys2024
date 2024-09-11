@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -8,7 +9,7 @@ public class WorldGenerator : MonoBehaviour
     [System.Serializable]
     public struct LayerTile
     {
-        public Tile tile;
+        public TileBase tile;
         [Range(0, 1)]
         public float depth;
     }
@@ -23,11 +24,16 @@ public class WorldGenerator : MonoBehaviour
         public uint width;
     }
 
+    public GameObject playerObject;
     public LayerTile[] tiles;
+    public FeatureTile[] features;
+    public Tile slopeRight;
+    public Tile belowSlopeRight;
+    public Tile slopeLeft;
+    public Tile belowSlopeLeft;
     [Tooltip("The actual size of the chunk will be twice this value")]
     public int chunkSize = 25;
     public int chunkBottomLimit = -15;
-    public FeatureTile[] features;
     [Space]
     [Header("Noise Variables")]
     public int seed;
@@ -44,8 +50,8 @@ public class WorldGenerator : MonoBehaviour
     public float lacunarity = 1;
     public Vector2Int offset = Vector2Int.zero;
     public Tilemap featuresTilemap;
+    public Tilemap groundTilemap;
 
-    Tilemap groundTilemap;
     Dictionary<Vector3, Tile> playerChanges = new();
     Dictionary<Vector3Int, Tile> featuresLayer = new();
     // [HideInInspector]
@@ -58,11 +64,12 @@ public class WorldGenerator : MonoBehaviour
 
     void Start()
     {
-        groundTilemap = GetComponent<Tilemap>();
         Random.InitState(seed);
         xPos = 0;
 
         playerChanges.Clear();
+
+        playerObject.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
     }
 
     public void DeleteTileAt(Vector3 pos)
@@ -101,12 +108,13 @@ public class WorldGenerator : MonoBehaviour
         }
     }
 
+    void OnPlayerMove(Vector3 movement, Vector3 position, Vector3 velocity) => xPos = Mathf.RoundToInt(position.x);
 
     void BuildWorld(bool updateFeatures)
     {
         featuresTilemap.ClearAllTiles();
         groundTilemap.ClearAllTiles();
-        transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
+        groundTilemap.transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
         previous_xPos = xPos;
 
         CheckArguments();
@@ -120,6 +128,7 @@ public class WorldGenerator : MonoBehaviour
             FillColumn(x, noiseVal);
         }
 
+        heightMap = AddSlopes(heightMap);
         if (updateFeatures)
             PlaceFeatures(heightMap);
     }
@@ -160,10 +169,46 @@ public class WorldGenerator : MonoBehaviour
 
             float depth = Remap(y, chunkBottomLimit, maxHeight, 0, 1);
 
-            TileBase availableTile = tiles.ToList().FirstOrDefault(x => x.depth <= depth).tile;
+            var firstOption = tiles.ToList().FirstOrDefault(x => x.depth <= depth);
+            List<TileBase> availableTiles = new()
+            {
+                firstOption.tile
+            };
+            availableTiles.AddRange(tiles.ToList().FindAll(x => x.depth == firstOption.depth).Select(x => x.tile));
 
-            groundTilemap.SetTile(new Vector3Int(x, y), availableTile);
+            var worldpos = Vector3Int.FloorToInt(groundTilemap.CellToWorld(new Vector3Int(x, y)));
+
+            System.Random rng = new(seed + worldpos.GetHashCode());
+            groundTilemap.SetTile(new Vector3Int(x, y), availableTiles[rng.Next(availableTiles.Count)]);
         }
+    }
+
+    int[] AddSlopes(int[] heightMap)
+    {
+        for (int x = 1, lastHeight = heightMap[0]; x < 2 * chunkSize; x++)
+        {
+            int currentHeight = heightMap[x];
+            if (currentHeight < lastHeight)
+            {
+                heightMap[x] = lastHeight;
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize, lastHeight))))
+                    groundTilemap.SetTile(new Vector3Int(x - chunkSize, lastHeight), slopeLeft);
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize, currentHeight))))
+                    groundTilemap.SetTile(new Vector3Int(x - chunkSize, currentHeight), belowSlopeLeft);
+            }
+            else if (currentHeight > lastHeight)
+            {
+                heightMap[x - 1] = currentHeight;
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize - 1, currentHeight))))
+                    groundTilemap.SetTile(new Vector3Int(x - chunkSize - 1, currentHeight), slopeRight);
+                if (!playerChanges.Any(v => groundTilemap.WorldToCell(v.Key).Equals(new Vector3Int(x - chunkSize - 1, lastHeight))))
+                    groundTilemap.SetTile(new Vector3Int(x - chunkSize - 1, lastHeight), belowSlopeRight);
+            }
+
+            lastHeight = currentHeight;
+        }
+
+        return heightMap;
     }
 
     void PlaceFeatures(int[] heightMap)

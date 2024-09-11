@@ -4,52 +4,66 @@ using UnityEngine;
 
 public class PlayerGraphics : MonoBehaviour
 {
-    public GameObject playerSprite;
+    public GameObject playerGFX;
 
+    float stretchHeight = 1.1f;
+    float stretchWidth = 1.05f;
+    float originalHeight = 1.0f;
+    float originalWidth = 1.0f;
+    float playerOriginalScale = 1f;
     float rotSpeed = 5f;
     bool shouldRotate = false;
     Transform originalStartRot;
     Transform originalEndRot;
 
-    Vector3 m_from = new Vector3(0.0F, 0.0F, 0.0F);
-    Vector3 m_to = new Vector3(0.0F, 0.0F, -10.0F);
-
-
+    float rotateAngle = 10;
+    bool facing = true;
     bool hammerRotated = false;
 
     void Start()
     {
-
+        var playerMovement = GetComponent<PlayerMovement>();
+        playerMovement.OnPlayerJump += JumpPlayer;
+        playerMovement.OnPlayerLand += LandPlayer;
+        playerMovement.OnPlayerMove += MovePlayer;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // If our inputX is not 0, we lerp between 0 and -10 on the Z axis 
+        // If our inputX is not 0, we lerp between 0 and -10 on the Z axis
         // Otherwise rotation will be reset.
-        if (shouldRotate) {SquishRun();}
-        else {ResetRotation();}
+        if (shouldRotate) SquishRun();
+        else ResetRotation();
 
     }
 
-    public void UpdateRotate(bool rot)
+    public void MovePlayer(Vector3 movementVector, Vector3 position, Vector3 velocity)
     {
-        shouldRotate = rot;
+        if (movementVector.sqrMagnitude >= 0.01)
+            shouldRotate = true;
+        else
+            shouldRotate = false;
+
+        if (movementVector.x > 0 && !facing)
+        {
+            Flip();
+            facing = !facing;
+        }
+        else if (movementVector.x < 0 && facing)
+        {
+            Flip();
+            facing = !facing;
+        }
     }
 
     // Warp the scale of the sprite when jumping
-    public void JumpPlayer(float x, float y)
-    {
-        playerSprite.transform.localScale = new Vector2(x, y);
-    }
+    public void JumpPlayer() => playerGFX.transform.localScale = new Vector2(stretchWidth, stretchHeight);
+    public void LandPlayer() => playerGFX.transform.localScale = new Vector2(originalWidth, originalHeight);
 
     // Move the player direction to flip all child objects
     // including the sprite and rotation targets
-    public void FlipPlayer(GameObject target, float x, float y)
-    {
-        // Changed from playerSPrite to target.....
-        target.transform.localScale = new Vector2(x, y);
-    }
+    public void Flip() => playerGFX.transform.localScale = new Vector2(-playerGFX.transform.localScale.x, playerGFX.transform.localScale.y);
 
     public void RotateHammer(GameObject target, float direction)
     {
@@ -60,23 +74,22 @@ public class PlayerGraphics : MonoBehaviour
             target.transform.localRotation = Quaternion.identity;
             hammerRotated = false;
         }
-        else if(!hammerRotated)
+        else if (!hammerRotated)
         {
             target.transform.Rotate(0f, 0f, 80f, Space.World);
             hammerRotated = true;
         }
-
     }
 
     public void SquishRun()
     {
         // Transform the start transform's vector3 position into Euler angles
-        Quaternion fromRot = Quaternion.Euler(m_from);
-        Quaternion toRot = Quaternion.Euler(m_to);
+        Quaternion fromRot = Quaternion.identity;
+        Quaternion toRot = Quaternion.Euler(Vector3.forward * rotateAngle * (facing ? -1 : 1));
 
         // might have to tweak
         float lerp = 0.5f * (1.0f + Mathf.Sin(Mathf.PI * Time.realtimeSinceStartup * rotSpeed));
-        playerSprite.transform.localRotation = Quaternion.Lerp(fromRot, toRot, lerp);
+        playerGFX.transform.localRotation = Quaternion.Lerp(fromRot, toRot, lerp);
     }
 
     public void SquishMine()
@@ -89,6 +102,6 @@ public class PlayerGraphics : MonoBehaviour
 
     void ResetRotation()
     {
-        playerSprite.transform.localRotation = Quaternion.identity;
+        playerGFX.transform.localRotation = Quaternion.identity;
     }
 }
