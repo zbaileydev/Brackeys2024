@@ -547,6 +547,7 @@ MonoBehaviour:
     depth: 0
   chunkSize: 22
   chunkBottomLimit: -8
+  features: []
   seed: 0
   octaves: 2
   amplitude: 20
@@ -554,6 +555,7 @@ MonoBehaviour:
   frequency: 2.5
   lacunarity: 0.5
   offset: {x: 0, y: -4}
+  featuresTilemap: {fileID: 1652438964}
   xPos: 0
 --- !u!1 &2113173386
 GameObject:

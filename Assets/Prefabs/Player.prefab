@@ -277,9 +277,10 @@ GameObject:
   - component: {fileID: 8598306330289361134}
   - component: {fileID: 2576048666665199130}
   - component: {fileID: 6228405285423063770}
-  m_Layer: 0
+  - component: {fileID: 5198820543280893333}
+  m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -425,7 +426,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &2576048666665199130
 MonoBehaviour:
@@ -460,6 +461,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerSprite: {fileID: 2579146373032401731}
+--- !u!114 &5198820543280893333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8598306330289361133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6815711a2c6e2734fbcb28b05b072839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentWeapon: {fileID: 0}
+  currentTool: {fileID: 0}
+  inventory: []
 --- !u!1 &8598306330638793475
 GameObject:
   m_ObjectHideFlags: 0
