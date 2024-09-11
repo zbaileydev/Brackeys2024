@@ -39,14 +39,32 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Loot Container"))
         {
-            string item = other.gameObject.GetComponent<ILootContainer>().GetLoot();
+            string item = other.gameObject.GetComponent<LootChest>().GetLoot();
             if (item != string.Empty)
-                Debug.Log($"Collected {item}");
-            if (other.gameObject.GetComponent<ModifierItem>() != null)
             {
-                playerModifier.ApplyModifier(other.gameObject.GetComponent<ModifierItem>());
+                //Debug.Log($"Collected {item}");
+                GameObject lootPrefab = Resources.Load<GameObject>($"Loot/{item}");
+
+                if (lootPrefab != null)
+                {
+                    // Destroy the chest and create the item.
+                    Destroy(other.gameObject);
+                    Instantiate(lootPrefab, transform.position, Quaternion.identity);
+                }
             }
         }
+
+        if (other.gameObject.CompareTag("Loot"))
+        {
+            if (other.gameObject.GetComponent<Item>() != null)
+            {
+                ModifierItem modifierItem = other.gameObject.GetComponent<Item>().GetModifier();
+                Debug.Log(modifierItem);
+                playerModifier.ApplyModifier(modifierItem);
+                Destroy(other.gameObject);
+            }
+        }
+
     }
 
 }

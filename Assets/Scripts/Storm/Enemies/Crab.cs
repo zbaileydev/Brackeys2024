@@ -17,8 +17,8 @@ public class Crab : Enemy
 
     private void OnCollisionEnter2D(Collision2D other) 
     {
-        Debug.Log("test1");
-        Debug.Log(other.gameObject.layer);
+        //Debug.Log("test1");
+        //Debug.Log(other.gameObject.layer);
         if(other.gameObject.layer == 6)
         {
             Debug.Log("test2");

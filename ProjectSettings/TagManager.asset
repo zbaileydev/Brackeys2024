@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Loot Container
   - Floor
+  - Loot
   layers:
   - Default
   - TransparentFX

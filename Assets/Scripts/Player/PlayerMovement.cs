@@ -26,12 +26,12 @@ public class PlayerMovement : MonoBehaviour
     Vector3 movement;
 
     Rigidbody2D rb;
-    AudioManager am;
+    //AudioManager am;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        am = AudioManager.instance;
+        //am = AudioManager.instance;
     }
 
     void Update()
@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = false;
             OnPlayerJump?.Invoke();
             jump = true;
-            am.PauseClip(am.footstepSFX);
+            //am.PauseClip(am.footstepSFX);
         }
 
         float inputX = Input.GetAxis("Horizontal");
@@ -81,7 +81,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (movement.x != 0 && isGrounded && !stepSounds)
         {
-            am.PlayClip(am.footstepSFX, am.footstepSFXVolume, true); //Play the footsteps indefinitely (LOOP).
+            //am.PlayClip(am.footstepSFX, am.footstepSFXVolume, true); //Play the footsteps indefinitely (LOOP).
             stepSounds = true;
         }
 
@@ -98,22 +98,9 @@ public class PlayerMovement : MonoBehaviour
 
         if (movement.x == 0)
         {
-            am.PauseClip(am.footstepSFX);
+            //am.PauseClip(am.footstepSFX);
             stepSounds = false;
         }
 
-    }
-
-    void OnCollisionEnter2D(Collision2D other)
-    {
-        //                      TEMPORARY
-        // TODO: Move to new script that handles loot and inventory ||
-        //                                                          \/
-        if (other.gameObject.CompareTag("Loot Container"))
-        {
-            string item = other.gameObject.GetComponent<ILootContainer>().GetLoot();
-            if (item != string.Empty)
-                Debug.Log($"Collected {item}");
-        }
     }
 }
