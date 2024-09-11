@@ -24,6 +24,7 @@ public class WorldGenerator : MonoBehaviour
         public uint width;
     }
 
+    public GameObject playerObject;
     public LayerTile[] tiles;
     public FeatureTile[] features;
     public Tile slopeRight;
@@ -67,6 +68,8 @@ public class WorldGenerator : MonoBehaviour
         xPos = 0;
 
         playerChanges.Clear();
+
+        playerObject.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
     }
 
     public void DeleteTileAt(Vector3 pos)
@@ -105,6 +108,7 @@ public class WorldGenerator : MonoBehaviour
         }
     }
 
+    void OnPlayerMove(Vector3 movement, Vector3 position, Vector3 velocity) => xPos = Mathf.RoundToInt(position.x);
 
     void BuildWorld(bool updateFeatures)
     {
