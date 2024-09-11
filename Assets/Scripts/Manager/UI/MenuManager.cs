@@ -1,4 +1,6 @@
 using System.Collections;
+using FMODUnity;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,9 +9,9 @@ public class MenuManager : MonoBehaviour
     public static MenuManager Instance { get; private set; }
 
     [Header("SFX")]
-    public AudioSource hoverSound;
-    public AudioSource sliderSound;
-    public AudioSource clickSound;
+    public FMODUnity.EventReference hoverSound;
+    public FMODUnity.EventReference sliderSound;
+    public FMODUnity.EventReference clickSound;
 
     [Header("Menu Canvas")]
     public GameObject pauseMenu;
@@ -169,6 +171,7 @@ public class MenuManager : MonoBehaviour
 
     public void ClickPlay()
     {
+        FMODUnity.RuntimeManager.PlayOneShot(clickSound);
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = currentSceneIndex + 1;
         levelLoader.LoadScene(nextSceneIndex);
