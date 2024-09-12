@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -48,9 +49,8 @@ public class PlayerMovement : MonoBehaviour
         foreach (var check in groundChecks)
             colliders.AddRange(Physics2D.OverlapCircleAll(check.position, groundCheckRadius, groundLayer));
 
-        for (int i = 0; i < colliders.Count; i++)
-            if (colliders[i].gameObject != gameObject)
-                isGrounded = true;
+        isGrounded = colliders.Any(x => x.gameObject != gameObject);
+
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
@@ -63,13 +63,13 @@ public class PlayerMovement : MonoBehaviour
         float inputX = Input.GetAxisRaw("Horizontal");
         movement = new Vector3(movementSpeed * inputX, 0);
 
-        if (Input.GetMouseButtonDown(0))
-            worldGenerator.DeleteTileAt(transform.position + Vector3.down);
-        if (Input.GetMouseButtonDown(1) && !weaponAnimation.isPlaying && currentWeapon != null)
-        {
-            weaponAnimation.Play();
-        }
-        if(!weaponAnimation.isPlaying) currentWeapon.AttackCycleEnded(); //this is stupid to do this in update instead of some event, if someone can figure out how to fix it please do
+        // if (Input.GetMouseButtonDown(0))
+        //     worldGenerator.DeleteTileAt(transform.position + Vector3.down);
+        // if (Input.GetMouseButtonDown(1) && !weaponAnimation.isPlaying && currentWeapon != null)
+        // {
+        //     weaponAnimation.Play();
+        // }
+        // if(!weaponAnimation.isPlaying) currentWeapon.AttackCycleEnded(); //this is stupid to do this in update instead of some event, if someone can figure out how to fix it please do
     }
 
     void FixedUpdate()

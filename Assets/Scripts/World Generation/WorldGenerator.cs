@@ -27,6 +27,18 @@ public class WorldGenerator : MonoBehaviour
     }
 
     [System.Serializable]
+    public struct StructureObject
+    {
+        public GameObject structure;
+        public Vector3 offset;
+        // TODO: implement
+        [Tooltip("A spawn chance of 0 will spawn only once when the world is created at the spawn point.")]
+        [Range(0, 1)]
+        public float spawnChance;
+        public uint width;
+    }
+
+    [System.Serializable]
     public struct LootContainer
     {
         public GameObject containerPrefab;
@@ -39,6 +51,7 @@ public class WorldGenerator : MonoBehaviour
     public GameObject playerObject;
     public LayerTile[] tiles;
     public FeatureTile[] features;
+    public StructureObject[] structures;
     public LootContainer[] lootContainers;
     public Tile slopeRight;
     public Tile belowSlopeRight;
@@ -64,19 +77,23 @@ public class WorldGenerator : MonoBehaviour
     public float lacunarity = 1;
     public Vector2Int offset = Vector2Int.zero;
     public Tilemap featuresTilemap;
+    public Tilemap structuresTilemap;
     public Tilemap groundTilemap;
 
     List<Vector3> playerChanges = new();
     List<int> regionsWithLoot = new();
-    Dictionary<Vector3Int, Tile> featuresLayer = new();
+    List<Vector3Int> featuresLayer = new();
+    List<Vector3Int> structuresLayer = new();
     // Dictionary<int, (Vector3, GameObject)> lootContainersHolder = new();
     // [HideInInspector]
     public int xPos;
     int previous_xPos;
     bool update = true;
+    int previousStructures_xPos;
     int previousFeatures_xPos;
     int previousLoot_xPos;
     bool updateFeatures = true;
+    bool updateStructures = true;
     bool updateLoot = true;
     int[] heightMap;
 
@@ -112,10 +129,17 @@ public class WorldGenerator : MonoBehaviour
     {
         if (previous_xPos != xPos)
             update = true;
+
         if (Mathf.Abs(previousFeatures_xPos - xPos) >= 5)
         {
             updateFeatures = true;
             previousFeatures_xPos = xPos;
+        }
+
+        if (Mathf.Abs(previousStructures_xPos - xPos) >= 10)
+        {
+            updateStructures = true;
+            previousStructures_xPos = xPos;
         }
 
         if (Mathf.Abs(previousLoot_xPos - xPos) >= minSpaceBetweenLootContainers)
@@ -154,6 +178,8 @@ public class WorldGenerator : MonoBehaviour
 
         if (updateFeatures)
             PlaceFeatures(heightMap);
+        if (updateStructures)
+            PlaceStructures(heightMap);
 
         heightMap = AddSlopes(heightMap);
         if (updateLoot)
@@ -242,7 +268,7 @@ public class WorldGenerator : MonoBehaviour
         {
             flatSize = 1;
             Vector3Int currentCellPos = featuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + chunkSize] + 1)));
-            if (featuresLayer.Any(v => v.Key.Equals(currentCellPos)))
+            if (featuresLayer.Any(v => v.x == currentCellPos.x))
             {
                 // Tile feature = featuresLayer.First(v => v.Key.Equals(currentCellPos)).Value;
                 // if (feature != null)
@@ -252,7 +278,7 @@ public class WorldGenerator : MonoBehaviour
 
             for (int i = x + 1, j = 1; i < chunkSize; i++, j++)
             {
-                if (featuresLayer.Any(v => v.Key.Equals(new Vector3Int(currentCellPos.x + j, currentCellPos.y))))
+                if (featuresLayer.Any(v => v.x == (currentCellPos.x + j)))
                     break;
 
                 if (heightMap[i + chunkSize] == heightMap[x + chunkSize])
@@ -265,7 +291,7 @@ public class WorldGenerator : MonoBehaviour
             if (potentialFeatures.Length == 0)
             {
                 for (int i = 0; i < flatSize; i++)
-                    featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y), null);
+                    featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
                 continue;
             }
 
@@ -277,16 +303,78 @@ public class WorldGenerator : MonoBehaviour
             if (potentialFeatures.Length == 0)
             {
                 for (int i = 0; i < flatSize; i++)
-                    featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y), null);
+                    featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
                 continue;
             }
 
             Tile selectedFeature = potentialFeatures[0].tile;
             featuresTilemap.SetTile(currentCellPos, selectedFeature);
 
-            featuresLayer.Add(currentCellPos, selectedFeature);
+            featuresLayer.Add(currentCellPos);
             for (int i = 1; i < flatSize; i++)
-                featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y), null);
+                featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
+        }
+    }
+
+    // duplicate function
+    void PlaceStructures(int[] heightMap)
+    {
+        for (int x = -chunkSize, flatSize; x < chunkSize - 1; x += flatSize)
+        {
+            flatSize = 1;
+            Vector3Int currentCellPos = structuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + chunkSize] + 1)));
+            if (structuresLayer.Any(v => v.x == currentCellPos.x))
+            {
+                // Tile feature = structuresLayer.First(v => v.Key.Equals(currentCellPos)).Value;
+                // if (feature != null)
+                //     structuresTilemap.SetTile(currentCellPos, feature);
+                continue;
+            }
+
+            int heightJumps = 0;
+            for (int i = x + 1, j = 1; i < chunkSize; i++, j++)
+            {
+                if (structuresLayer.Any(v => v.x == (currentCellPos.x + j)))
+                    break;
+
+                if (heightMap[i + chunkSize] != heightMap[x + chunkSize])
+                {
+                    if (heightMap[i + chunkSize] < heightMap[x + chunkSize])
+                        heightJumps--;
+                    else
+                        heightJumps++;
+
+                    if (Mathf.Abs(heightJumps) > 1)
+                        break;
+                }
+                flatSize++;
+            }
+
+            StructureObject[] potentialStructures = structures.ToList().FindAll(v => v.width <= flatSize).OrderBy(v => v.width).Reverse().ToArray();
+            if (potentialStructures.Length == 0)
+            {
+                for (int i = 0; i < flatSize; i++)
+                    structuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
+                continue;
+            }
+
+            float chance = Random.value;
+
+            potentialStructures = potentialStructures.ToList().FindAll(v => v.spawnChance >= chance).ToArray();
+            if (potentialStructures.Length == 0)
+            {
+                for (int i = 0; i < flatSize; i++)
+                    structuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
+                continue;
+            }
+
+            GameObject selectedStructure = potentialStructures[0].structure;
+            Instantiate(selectedStructure, groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + chunkSize] + 1)) + potentialStructures[0].offset, Quaternion.identity);
+
+            structuresLayer.Add(currentCellPos);
+
+            for (int i = 0; i < flatSize; i++)
+                structuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
         }
     }
 
