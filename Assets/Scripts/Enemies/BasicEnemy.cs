@@ -35,6 +35,11 @@ public class BasicEnemy : Enemy
         throw new System.NotImplementedException();
     }
 
+    public override void Knockback(float force)
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override void Move()
     {
         throw new System.NotImplementedException();

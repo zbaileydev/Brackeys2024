@@ -46,7 +46,6 @@ public abstract class Enemy : MonoBehaviour
 
     virtual public void Init()
     {
-        // StartCoroutine(Process());
         target = PickTarget();
         playerTransform = GameManager.Instance.player.transform;
         rb = GetComponent<Rigidbody2D>();
@@ -54,21 +53,12 @@ public abstract class Enemy : MonoBehaviour
         movementSpeed = wanderingSpeed;
     }
 
-    // virtual public IEnumerator Process()
-    // {
-    //     while (true)
-    //     {
-    //         Move();
-    //         yield return null;
-    //     }
-    // }
-
     public abstract Vector3 PickTarget();
     // In the FixedUpdate loop
     public abstract void Move();
     public abstract void Attack();
     public abstract void Stun();
-    // public abstract void ActivateAbility();
+    public abstract void Knockback(float force);
     public virtual void Die()
     {
         Destroy(gameObject);
