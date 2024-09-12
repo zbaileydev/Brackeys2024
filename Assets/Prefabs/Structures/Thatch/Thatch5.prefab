@@ -234,7 +234,7 @@ TilemapCollider2D:
   m_GameObject: {fileID: 734704070300010832}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 19c758f541a9f7d688622b526ae00a41, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -307,7 +307,7 @@ MonoBehaviour:
   - {x: 2.1937401, y: 2.6195538, z: 0}
   m_ShapePathHash: 431150087
   m_Mesh: {fileID: 0}
-  m_InstanceId: 74534
+  m_InstanceId: 50554
   m_LocalBounds:
     m_Center: {x: -0.43225574, y: 2.743454, z: 0}
     m_Extent: {x: 2.8294141, y: 0.14249241, z: 0}
@@ -847,7 +847,7 @@ MonoBehaviour:
   - {x: 1.4544973, y: -0.89516115, z: 0}
   m_ShapePathHash: 1484426608
   m_Mesh: {fileID: 0}
-  m_InstanceId: 74528
+  m_InstanceId: 50548
   m_LocalBounds:
     m_Center: {x: -3.1998348, y: -0.49395803, z: 0}
     m_Extent: {x: 4.6872435, y: 0.40120313, z: 0}
@@ -2222,7 +2222,7 @@ TilemapCollider2D:
   m_GameObject: {fileID: 7465953520373171125}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 19c758f541a9f7d688622b526ae00a41, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -2278,7 +2278,7 @@ MonoBehaviour:
   - {x: 6.5811796, y: -0.87306225, z: 0}
   m_ShapePathHash: -1846205631
   m_Mesh: {fileID: 0}
-  m_InstanceId: 74544
+  m_InstanceId: 50564
   m_LocalBounds:
     m_Center: {x: 5.7338963, y: -0.49692488, z: 0}
     m_Extent: {x: 1.175668, y: 0.37613738, z: 0}

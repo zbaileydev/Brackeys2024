@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,16 +6,14 @@ using UnityEngine;
 public class PlayerGraphics : MonoBehaviour
 {
     public GameObject playerGFX;
+    public GameObject playerSprite;
 
     float stretchHeight = 1.1f;
-    float stretchWidth = 1.05f;
-    float originalHeight = 1.0f;
-    float originalWidth = 1.0f;
-    float playerOriginalScale = 1f;
+    float stretchWidth = 0.5f;
+    float originalWidth;
+    float originalHeight;
     float rotSpeed = 5f;
     bool shouldRotate = false;
-    Transform originalStartRot;
-    Transform originalEndRot;
 
     float rotateAngle = 10;
     bool facing = true;
@@ -48,22 +47,27 @@ public class PlayerGraphics : MonoBehaviour
         if (movementVector.x > 0 && !facing)
         {
             Flip();
-            facing = !facing;
+            facing = true;
         }
         else if (movementVector.x < 0 && facing)
         {
             Flip();
-            facing = !facing;
+            facing = false;
         }
     }
 
     // Warp the scale of the sprite when jumping
-    public void JumpPlayer() => playerGFX.transform.localScale = new Vector2(stretchWidth, stretchHeight);
-    public void LandPlayer() => playerGFX.transform.localScale = new Vector2(originalWidth, originalHeight);
+    public void JumpPlayer()
+    {
+        originalWidth = playerSprite.transform.localScale.x;
+        originalHeight = playerSprite.transform.localScale.y;
+        playerSprite.transform.localScale = new Vector2(stretchWidth, stretchHeight);
+    }
+    public void LandPlayer() => playerSprite.transform.localScale = new Vector2(originalWidth, originalHeight);
 
     // Move the player direction to flip all child objects
     // including the sprite and rotation targets
-    public void Flip() => playerGFX.transform.localScale = new Vector2(-playerGFX.transform.localScale.x, playerGFX.transform.localScale.y);
+    public void Flip() => playerGFX.transform.localScale = new Vector2((facing ? -1 : 1) * MathF.Abs(playerGFX.transform.localScale.x), playerGFX.transform.localScale.y);
 
     public void RotateHammer(GameObject target, float direction)
     {

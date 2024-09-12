@@ -107,7 +107,7 @@ public class WorldGenerator : MonoBehaviour
 
         Random.InitState(seed);
 
-        // playerObject.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
+        playerObject.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
     }
 
     public void DeleteTileAt(Vector3 pos)
@@ -429,7 +429,7 @@ public class WorldGenerator : MonoBehaviour
                         {
                             Vector2 pos = new(worldPos.x + i, worldPos.y + j);
                             DeleteTileAt(pos);
-                            groundTilemap.SetTile(new Vector3Int((int)pos.x, (int)pos.y), null);
+                            // groundTilemap.SetTile(new Vector3Int((int)pos.x, (int)pos.y), null);
                         }
                     }
 
