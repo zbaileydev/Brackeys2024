@@ -374,6 +374,8 @@ GameObject:
   - component: {fileID: 2576048666665199130}
   - component: {fileID: 6228405285423063770}
   - component: {fileID: 6956945009493485984}
+  - component: {fileID: -1839515733680143261}
+  - component: {fileID: 8656641125225145903}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -525,6 +527,8 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 1
+  currentWeapon: {fileID: 0}
+  weaponAnimation: {fileID: 0}
   movementSpeed: 10
   jumpThrust: 15
   airControl: 1
@@ -554,8 +558,41 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentWeapon: {fileID: 0}
+  weaponAnimation: {fileID: 0}
   currentTool: {fileID: 0}
   inventory: []
+--- !u!114 &-1839515733680143261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8598306330289361133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91bd2f15effe641429d7654fc40b8da9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Health: 0
+  Inventory: []
+  baseCritChance: 0
+  baseMovementSpeed: 0
+  baseHealth: 0
+  baseDamage: 0
+  baseKnockbackChance: 0
+  baseWeaponSize: 0
+--- !u!114 &8656641125225145903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8598306330289361133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab26bb758ee45c84ca6fb304447523bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8598306330638793475
 GameObject:
   m_ObjectHideFlags: 0

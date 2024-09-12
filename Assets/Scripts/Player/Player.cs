@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     private List<ModifierItem> modifiers = new List<ModifierItem>();
 
     private PlayerModifier playerModifier;
+    private bool modLock;
 
     // Damage, MovementSpeed, Health, Crit, WeaponSize, Knockback
 
@@ -25,6 +26,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         playerModifier = GetComponent<PlayerModifier>();
+        modLock = false;
     }
 
     // Update is called once per frame
@@ -56,12 +58,14 @@ public class Player : MonoBehaviour
 
         if (other.gameObject.CompareTag("Loot"))
         {
-            if (other.gameObject.GetComponent<Item>() != null)
+            if (other.gameObject.GetComponent<Item>() != null && !modLock)
             {
+                modLock = true;
                 ModifierItem modifierItem = other.gameObject.GetComponent<Item>().GetModifier();
                 Debug.Log(modifierItem);
                 playerModifier.ApplyModifier(modifierItem);
                 Destroy(other.gameObject);
+                modLock = false;
             }
         }
 
