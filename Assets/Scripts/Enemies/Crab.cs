@@ -41,7 +41,7 @@ public class Crab : Enemy
         }
         else if (Chasing)
         {
-            if (Mathf.Abs(target.x - transform.position.x) <= personalSpace)
+            if ((target - transform.position).sqrMagnitude <= personalSpace * personalSpace)
             {
                 atTarget = true;
                 if (Time.time - lastAttackTime >= attackCooldown)

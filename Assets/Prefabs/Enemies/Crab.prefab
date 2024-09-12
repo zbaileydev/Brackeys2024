@@ -121,8 +121,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  wanderingSpeed: 1
-  chasingSpeed: 3
+  wanderingSpeed: 3
+  chasingSpeed: 5
   wanderingRadius: 5
   health: 10
   damage: 2
