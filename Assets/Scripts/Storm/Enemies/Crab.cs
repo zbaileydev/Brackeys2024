@@ -12,7 +12,7 @@ public class Crab : Enemy
     }
     override public void Move()
     {
-        rb.velocity = new Vector2(currentXDirection*movementSpeed,0);
+        rb.velocity = new Vector2(currentXDirection*movementSpeed,rb.velocity.y);
     }
 
     private void OnCollisionEnter2D(Collision2D other) 

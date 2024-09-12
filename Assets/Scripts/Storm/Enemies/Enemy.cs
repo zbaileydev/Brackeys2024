@@ -21,6 +21,7 @@ public abstract class Enemy : MonoBehaviour
     [SerializeField] protected float abilityCooldown;
     [SerializeField] protected Rigidbody2D rb; 
     [SerializeField] protected Transform playerTransform;
+    [SerializeField] float health; 
     Transform target;
 
     private void Awake() // for testings
@@ -54,6 +55,17 @@ public abstract class Enemy : MonoBehaviour
     virtual public void ActivateAbility()
     {
         
+    }
+
+    public void TakeDamage(int num)
+    {
+        health-=num;
+        if(health<=0) Death();
+    }
+
+    void Death()
+    {
+        Destroy(gameObject);
     }
 
     virtual public IEnumerator AbilityCycle()

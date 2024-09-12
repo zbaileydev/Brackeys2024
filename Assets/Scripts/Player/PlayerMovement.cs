@@ -12,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
     public WorldGenerator worldGenerator;
     public Transform[] groundChecks;
     public LayerMask groundLayer;
+    public Weapon currentWeapon;
+    [SerializeField] Animation weaponAnimation;
     public float movementSpeed = 10f;
     public float jumpThrust = 15f;
     public bool airControl = true;
@@ -63,6 +65,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
             worldGenerator.DeleteTileAt(transform.position + Vector3.down);
+        if (Input.GetMouseButtonDown(1) && !weaponAnimation.isPlaying && currentWeapon != null)
+        {
+            weaponAnimation.Play();
+        }
+        if(!weaponAnimation.isPlaying) currentWeapon.AttackCycleEnded(); //this is stupid to do this in update instead of some event, if someone can figure out how to fix it please do
     }
 
     void FixedUpdate()
