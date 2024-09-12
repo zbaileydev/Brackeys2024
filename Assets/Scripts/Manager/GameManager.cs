@@ -1,15 +1,20 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; set; }
     public LevelLoader levelManager;
     public MenuManager MenuManager;
-    public GameObject playerPrefab;
-
+    // public Tilemap groundTilemap;
     public HUD hud;
     public Cycle cycle;
+    [HideInInspector]
+    public GameObject player;
+
+    [SerializeField]
+    GameObject playerPrefab;
 
     private bool startedGame;
     private bool gamePhase;
@@ -41,15 +46,17 @@ public class GameManager : MonoBehaviour
         {
             Destroy(this);
         }
-
         else
         {
             Instance = this;
         }
+
         DontDestroyOnLoad(gameObject);
         DontDestroyOnLoad(levelManager.gameObject);
         DontDestroyOnLoad(MenuManager.gameObject);
         DontDestroyOnLoad(cycle.gameObject);
+
+        player = FindObjectOfType<PlayerMovement>().gameObject;
     }
 
     public void Update()
@@ -104,6 +111,8 @@ public class GameManager : MonoBehaviour
                 Destroy(player.gameObject);
 
         GameObject newPlayer = Instantiate(playerPrefab, pos, Quaternion.identity);
-        Camera.main.GetComponent<CameraFollow>().target = newPlayer.transform;
+        player = newPlayer;
+
+        Camera.main.GetComponent<CameraFollow>().target = player.transform;
     }
 }

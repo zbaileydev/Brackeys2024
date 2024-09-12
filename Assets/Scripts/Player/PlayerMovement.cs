@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -48,9 +49,8 @@ public class PlayerMovement : MonoBehaviour
         foreach (var check in groundChecks)
             colliders.AddRange(Physics2D.OverlapCircleAll(check.position, groundCheckRadius, groundLayer));
 
-        for (int i = 0; i < colliders.Count; i++)
-            if (colliders[i].gameObject != gameObject)
-                isGrounded = true;
+        isGrounded = colliders.Any(x => x.gameObject != gameObject);
+
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
