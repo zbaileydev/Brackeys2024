@@ -43,6 +43,7 @@ public class WorldGenerator : MonoBehaviour
     {
         public GameObject containerPrefab;
         public LootTable[] lootTables;
+        public Vector3 size;
         [Range(0, 1)]
         public float spawnChance;
         public bool buried;
@@ -59,6 +60,7 @@ public class WorldGenerator : MonoBehaviour
     public Tile belowSlopeLeft;
     [Tooltip("The actual size of the chunk will be twice this value")]
     public int chunkSize = 25;
+    public int heightMapSize = 50;
     public int chunkBottomLimit = -15;
     public int minSpaceBetweenLootContainers = 10;
     [Space]
@@ -82,8 +84,8 @@ public class WorldGenerator : MonoBehaviour
 
     List<Vector3> playerChanges = new();
     List<int> regionsWithLoot = new();
-    List<Vector3Int> featuresLayer = new();
-    List<Vector3Int> structuresLayer = new();
+    List<int> featuresLayer = new();
+    List<int> structuresLayer = new();
     // Dictionary<int, (Vector3, GameObject)> lootContainersHolder = new();
     // [HideInInspector]
     public int xPos;
@@ -99,12 +101,13 @@ public class WorldGenerator : MonoBehaviour
 
     void Start()
     {
-        Random.InitState(seed);
         xPos = 0;
 
         playerChanges.Clear();
 
-        playerObject.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
+        Random.InitState(seed);
+
+        // playerObject.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
     }
 
     public void DeleteTileAt(Vector3 pos)
@@ -130,13 +133,13 @@ public class WorldGenerator : MonoBehaviour
         if (previous_xPos != xPos)
             update = true;
 
-        if (Mathf.Abs(previousFeatures_xPos - xPos) >= 5)
+        if (Mathf.Abs(previousFeatures_xPos - xPos) >= 15)
         {
             updateFeatures = true;
             previousFeatures_xPos = xPos;
         }
 
-        if (Mathf.Abs(previousStructures_xPos - xPos) >= 10)
+        if (Mathf.Abs(previousStructures_xPos - xPos) >= 30)
         {
             updateStructures = true;
             previousStructures_xPos = xPos;
@@ -153,6 +156,8 @@ public class WorldGenerator : MonoBehaviour
             BuildWorld();
             update = false;
             updateFeatures = false;
+            updateStructures = false;
+            updateLoot = false;
         }
     }
 
@@ -160,30 +165,26 @@ public class WorldGenerator : MonoBehaviour
 
     void BuildWorld()
     {
-        // featuresTilemap.ClearAllTiles();
         groundTilemap.ClearAllTiles();
         groundTilemap.transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
         previous_xPos = xPos;
 
         CheckArguments();
 
-        heightMap = new int[2 * chunkSize];
-        for (int x = -chunkSize; x < chunkSize; x++)
-        {
-            int noiseVal = Mathf.RoundToInt(GetNoiseVal(x));
-            heightMap[x + chunkSize] = noiseVal;
+        heightMap = new int[2 * heightMapSize];
+        for (int x = -heightMapSize; x < heightMapSize; x++)
+            heightMap[x + heightMapSize] = Mathf.RoundToInt(GetNoiseVal(x)); ;
 
-            FillColumn(x, noiseVal);
-        }
+        FillWorld(heightMap[(heightMapSize - chunkSize)..(heightMapSize + chunkSize)]);
+        AddSlopes(heightMap[(heightMapSize - chunkSize)..(heightMapSize + chunkSize)]);
 
         if (updateFeatures)
             PlaceFeatures(heightMap);
         if (updateStructures)
             PlaceStructures(heightMap);
-
-        heightMap = AddSlopes(heightMap);
         if (updateLoot)
             PlaceLoot(heightMap);
+        // PlaceLoot(heightMap[(heightMapSize - chunkSize)..(heightMapSize + chunkSize)]);
     }
 
     void CheckArguments()
@@ -204,33 +205,39 @@ public class WorldGenerator : MonoBehaviour
             scale = Mathf.Epsilon;
     }
 
-    void FillColumn(int x, int maxHeight)
+    void FillWorld(int[] heightMap)
     {
         LayerTile[] _tiles = tiles.ToList().OrderBy(x => x.depth).Reverse().ToArray();
 
-        for (int y = chunkBottomLimit; y <= maxHeight; y++)
+        for (int x = -chunkSize; x < chunkSize; x++)
         {
-            if (playerChanges.Any(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x, y))))
-                continue;
-            // {
-            //     Tile playerChange = playerChanges.First(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x, y))).Value;
-            //     if (playerChange != null)
-            //         groundTilemap.SetTile(new Vector3Int(x, y), playerChange);
-            // }
-
-            float depth = Remap(y, chunkBottomLimit, maxHeight, 0, 1);
-
-            var firstOption = tiles.ToList().FirstOrDefault(x => x.depth <= depth);
-            List<TileBase> availableTiles = new()
+            int maxHeight = heightMap[x + chunkSize];
+            for (int y = chunkBottomLimit; y <= maxHeight; y++)
             {
-                firstOption.tile
-            };
-            availableTiles.AddRange(tiles.ToList().FindAll(x => x.depth == firstOption.depth).Select(x => x.tile));
+                if (playerChanges.Any(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x, y))))
+                    continue;
+                // {
+                //     Tile playerChange = playerChanges.First(v => groundTilemap.WorldToCell(v).Equals(new Vector3Int(x, y))).Value;
+                //     if (playerChange != null)
+                //         groundTilemap.SetTile(new Vector3Int(x, y), playerChange);
+                // }
 
-            var worldpos = Vector3Int.FloorToInt(groundTilemap.CellToWorld(new Vector3Int(x, y)));
+                float depth = Remap(y, chunkBottomLimit, maxHeight, 0, 1);
 
-            System.Random rng = new(seed + worldpos.GetHashCode());
-            groundTilemap.SetTile(new Vector3Int(x, y), availableTiles[rng.Next(availableTiles.Count)]);
+                var firstOption = tiles.ToList().FirstOrDefault(x => x.depth <= depth);
+                List<TileBase> availableTiles = new()
+                {
+                    firstOption.tile
+                };
+                availableTiles.AddRange(tiles.ToList().FindAll(x => x.depth == firstOption.depth).Select(x => x.tile));
+
+                var worldpos = Vector3Int.FloorToInt(groundTilemap.CellToWorld(new Vector3Int(x, y)));
+
+
+                System.Random rng = new(worldpos.GetHashCode());
+                rng = new(seed + rng.Next() + xPos + x);
+                groundTilemap.SetTile(new Vector3Int(x, y), availableTiles[rng.Next(availableTiles.Count)]);
+            }
         }
     }
 
@@ -264,11 +271,11 @@ public class WorldGenerator : MonoBehaviour
 
     void PlaceFeatures(int[] heightMap)
     {
-        for (int x = -chunkSize, flatSize; x < chunkSize - 1; x += flatSize)
+        for (int x = -heightMapSize, flatSize; x < heightMapSize - 1; x += flatSize + 1)
         {
-            flatSize = 1;
-            Vector3Int currentCellPos = featuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + chunkSize] + 1)));
-            if (featuresLayer.Any(v => v.x == currentCellPos.x))
+            flatSize = 0;
+            Vector3Int currentCellPos = featuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + heightMapSize] + 1)));
+            if (featuresLayer.Any(v => v == currentCellPos.x))
             {
                 // Tile feature = featuresLayer.First(v => v.Key.Equals(currentCellPos)).Value;
                 // if (feature != null)
@@ -276,54 +283,53 @@ public class WorldGenerator : MonoBehaviour
                 continue;
             }
 
-            for (int i = x + 1, j = 1; i < chunkSize; i++, j++)
+            for (int i = x + 1, j = 1; i < heightMapSize; i++, j++)
             {
-                if (featuresLayer.Any(v => v.x == (currentCellPos.x + j)))
+                if (featuresLayer.Any(v => v == (currentCellPos.x + j)))
                     break;
 
-                if (heightMap[i + chunkSize] == heightMap[x + chunkSize])
+                if (heightMap[i + heightMapSize] == heightMap[x + heightMapSize])
                     flatSize++;
                 else
                     break;
             }
 
-            FeatureTile[] potentialFeatures = features.ToList().FindAll(v => v.width <= flatSize).OrderBy(v => v.width).Reverse().ToArray();
+            FeatureTile[] potentialFeatures = features.ToList().FindAll(v => v.width <= flatSize).ToArray();
             if (potentialFeatures.Length == 0)
             {
                 for (int i = 0; i < flatSize; i++)
-                    featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
+                    featuresLayer.Add(currentCellPos.x + i);
                 continue;
             }
 
             float chance = Random.value;
-            if (chance <= 0.242 && flatSize >= 8)
-                Debug.Log(chance);
 
             potentialFeatures = potentialFeatures.ToList().FindAll(v => v.spawnChance >= chance).ToArray();
             if (potentialFeatures.Length == 0)
             {
                 for (int i = 0; i < flatSize; i++)
-                    featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
+                    featuresLayer.Add(currentCellPos.x + i);
                 continue;
             }
 
-            Tile selectedFeature = potentialFeatures[0].tile;
+            int random = Random.Range(0, potentialFeatures.Length);
+            Tile selectedFeature = potentialFeatures[random].tile;
+
             featuresTilemap.SetTile(currentCellPos, selectedFeature);
 
-            featuresLayer.Add(currentCellPos);
-            for (int i = 1; i < flatSize; i++)
-                featuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
+            for (int i = 0; i < flatSize; i++)
+                featuresLayer.Add(currentCellPos.x + i);
         }
     }
 
     // duplicate function
     void PlaceStructures(int[] heightMap)
     {
-        for (int x = -chunkSize, flatSize; x < chunkSize - 1; x += flatSize)
+        for (int x = -heightMapSize, flatSize; x < heightMapSize - 1; x += flatSize)
         {
             flatSize = 1;
-            Vector3Int currentCellPos = structuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + chunkSize] + 1)));
-            if (structuresLayer.Any(v => v.x == currentCellPos.x))
+            Vector3Int currentCellPos = structuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + heightMapSize] + 1)));
+            if (structuresLayer.Any(v => v == currentCellPos.x))
             {
                 // Tile feature = structuresLayer.First(v => v.Key.Equals(currentCellPos)).Value;
                 // if (feature != null)
@@ -332,14 +338,14 @@ public class WorldGenerator : MonoBehaviour
             }
 
             int heightJumps = 0;
-            for (int i = x + 1, j = 1; i < chunkSize; i++, j++)
+            for (int i = x + 1, j = 1; i < heightMapSize; i++, j++)
             {
-                if (structuresLayer.Any(v => v.x == (currentCellPos.x + j)))
+                if (structuresLayer.Any(v => v == (currentCellPos.x + j)))
                     break;
 
-                if (heightMap[i + chunkSize] != heightMap[x + chunkSize])
+                if (heightMap[i + heightMapSize] != heightMap[x + heightMapSize])
                 {
-                    if (heightMap[i + chunkSize] < heightMap[x + chunkSize])
+                    if (heightMap[i + heightMapSize] < heightMap[x + heightMapSize])
                         heightJumps--;
                     else
                         heightJumps++;
@@ -350,11 +356,11 @@ public class WorldGenerator : MonoBehaviour
                 flatSize++;
             }
 
-            StructureObject[] potentialStructures = structures.ToList().FindAll(v => v.width <= flatSize).OrderBy(v => v.width).Reverse().ToArray();
+            StructureObject[] potentialStructures = structures.ToList().FindAll(v => v.width <= flatSize).ToArray();
             if (potentialStructures.Length == 0)
             {
                 for (int i = 0; i < flatSize; i++)
-                    structuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
+                    structuresLayer.Add(currentCellPos.x + i);
                 continue;
             }
 
@@ -364,93 +370,127 @@ public class WorldGenerator : MonoBehaviour
             if (potentialStructures.Length == 0)
             {
                 for (int i = 0; i < flatSize; i++)
-                    structuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
+                    structuresLayer.Add(currentCellPos.x + i);
                 continue;
             }
 
-            GameObject selectedStructure = potentialStructures[0].structure;
-            Instantiate(selectedStructure, groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + chunkSize] + 1)) + potentialStructures[0].offset, Quaternion.identity);
+            int random = Random.Range(0, potentialStructures.Length);
+            GameObject selectedStructure = potentialStructures[random].structure;
+            flatSize = (int)potentialStructures[random].width;
 
-            structuresLayer.Add(currentCellPos);
+            Instantiate(selectedStructure, groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + heightMapSize] + 1)) + potentialStructures[random].offset, Quaternion.identity, transform);
 
             for (int i = 0; i < flatSize; i++)
-                structuresLayer.Add(new Vector3Int(currentCellPos.x + i, currentCellPos.y));
+                structuresLayer.Add(currentCellPos.x + i);
         }
     }
 
     void PlaceLoot(int[] heightMap)
     {
-        for (int x = -chunkSize; x < chunkSize; x += minSpaceBetweenLootContainers)
+        for (int x = -heightMapSize; x < heightMapSize; x += minSpaceBetweenLootContainers)
         {
             int currentRegion = Mathf.FloorToInt((float)(x + xPos) / minSpaceBetweenLootContainers);
             if (regionsWithLoot.Contains(currentRegion))
                 continue;
 
-            System.Random rng = new(seed + currentRegion);
             // (Vector3 pos, GameObject container) = lootContainersHolder[currentRegion];
             // Instantiate(container, pos, Quaternion.identity, transform);
 
-            if (rng.NextDouble() > 0.4)
+            if (Random.value > 0.4)
             {
                 regionsWithLoot.Add(currentRegion);
                 continue;
-            }
-
-            // Surface
-            {
-                LootContainer[] surfaceContainers = lootContainers.ToList().FindAll(x => !x.buried).ToArray();
-
-                float chance = (float)rng.NextDouble();
-                LootContainer[] potentialContainers = surfaceContainers.ToList().FindAll(x => x.spawnChance > chance).ToArray();
-
-                if (potentialContainers.Length != 0)
-                {
-                    Vector3 worldPos = groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + chunkSize] + 1));
-
-                    DeleteTileAt(worldPos);
-                    groundTilemap.SetTile(new Vector3Int(x, heightMap[x + chunkSize]), null);
-
-                    int random = Random.Range(0, potentialContainers.Length);
-                    GameObject container = Instantiate(potentialContainers[random].containerPrefab, worldPos + groundTilemap.tileAnchor, Quaternion.identity, transform);
-                    container.GetComponent<LootChest>().lootTable = potentialContainers[random].lootTables[Random.Range(0, potentialContainers[random].lootTables.Length)];
-
-                    regionsWithLoot.Add(currentRegion);
-                    continue;
-                }
             }
 
             // Buried
             {
                 LootContainer[] buriedContainers = lootContainers.ToList().FindAll(x => x.buried).ToArray();
 
-                float chance = (float)rng.NextDouble();
+                float chance = Random.value;
                 LootContainer[] potentialContainers = buriedContainers.ToList().FindAll(x => x.spawnChance > chance).ToArray();
 
+                if (potentialContainers.Length != 0)
+                {
+
+                    int yPos = Random.Range(chunkBottomLimit + 5, heightMap[x + heightMapSize] - 3);
+                    Vector3 worldPos = groundTilemap.CellToWorld(new Vector3Int(x, yPos));
+
+                    DeleteTileAt(worldPos);
+                    groundTilemap.SetTile(new Vector3Int(x, yPos), null);
+
+                    int random = Random.Range(0, potentialContainers.Length);
+                    Vector3 size = potentialContainers[random].size;
+                    GameObject container = Instantiate(potentialContainers[random].containerPrefab, worldPos + groundTilemap.tileAnchor + (size - Vector3.right - Vector3.up) / 2, Quaternion.identity, transform);
+                    container.GetComponent<LootChest>().lootTable = potentialContainers[random].lootTables[Random.Range(0, potentialContainers[random].lootTables.Length)];
+
+                    for (int i = 0; i < size.x; i++)
+                    {
+                        for (int j = 0; j < size.y; j++)
+                        {
+                            Vector2 pos = new(worldPos.x + i, worldPos.y + j);
+                            DeleteTileAt(pos);
+                            groundTilemap.SetTile(new Vector3Int((int)pos.x, (int)pos.y), null);
+                        }
+                    }
+
+                    regionsWithLoot.Add(currentRegion);
+                    continue;
+                }
+            }
+
+            // Surface
+            {
+                LootContainer[] surfaceContainers = lootContainers.ToList().FindAll(x => !x.buried).ToArray();
+
+                int highestFlatSize = -1, highestFlatSizex = Mathf.Max(currentRegion * minSpaceBetweenLootContainers - xPos, -heightMapSize);
+                for (int i = highestFlatSizex + 1, flatSize = 1, currentx = i; i < Mathf.Min((currentRegion + 1) * minSpaceBetweenLootContainers - xPos, heightMapSize); i++)
+                {
+                    if (heightMap[i + heightMapSize] == heightMap[i + heightMapSize - 1])
+                        flatSize++;
+                    else
+                    {
+                        if (flatSize > highestFlatSize)
+                        {
+                            highestFlatSize = flatSize;
+                            highestFlatSizex = currentx;
+                            currentx = i;
+                            flatSize = 1;
+                        }
+                    }
+                }
+
+                LootContainer[] potentialContainers = surfaceContainers.ToList().FindAll(x => x.size.x <= highestFlatSize).ToArray();
                 if (potentialContainers.Length == 0)
                     continue;
 
-                int yPos = Random.Range(chunkBottomLimit + 5, heightMap[x + chunkSize] - 3);
-                Vector3 worldPos = groundTilemap.CellToWorld(new Vector3Int(x, yPos));
+                float chance = Random.value;
+                potentialContainers = surfaceContainers.ToList().FindAll(x => x.spawnChance > chance).ToArray();
+                if (potentialContainers.Length == 0)
+                    continue;
 
-                DeleteTileAt(worldPos);
-                groundTilemap.SetTile(new Vector3Int(x, yPos), null);
+                Vector3 worldPos = groundTilemap.CellToWorld(new Vector3Int(highestFlatSizex, heightMap[highestFlatSizex + heightMapSize] + 1));
 
                 int random = Random.Range(0, potentialContainers.Length);
-                GameObject container = Instantiate(potentialContainers[random].containerPrefab, worldPos + groundTilemap.tileAnchor, Quaternion.identity, transform);
+                Vector3 size = potentialContainers[random].size;
+                GameObject container = Instantiate(potentialContainers[random].containerPrefab, worldPos + groundTilemap.tileAnchor + (size - Vector3.right - Vector3.up) / 2, Quaternion.identity, transform);
                 container.GetComponent<LootChest>().lootTable = potentialContainers[random].lootTables[Random.Range(0, potentialContainers[random].lootTables.Length)];
 
                 regionsWithLoot.Add(currentRegion);
-                break;
+                continue;
             }
         }
     }
 
     float GetNoiseVal(int x)
     {
+        var noise = new FastNoiseLite(seed);
+        noise.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
+
         float noiseVal = 0, scl = scale / 10, amp = amplitude;
         for (int i = 1; i <= octaves; i++)
         {
-            float rawVal = Mathf.Clamp01(Mathf.PerlinNoise((x + offset.x + xPos + 0xFFFF) * scl, seed)) * amp + offset.y;
+            float rawVal = noise.GetNoise((x + offset.x + xPos) * scl, seed) + 1;
+            rawVal = rawVal / 2 * amp + offset.y;
 
             scl *= frequency;
             amp *= lacunarity;
