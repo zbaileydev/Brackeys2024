@@ -11,6 +11,7 @@ public class Crab : Enemy
     Vector3 lastStuckCheckPos;
     float lastStuckCheckTime;
     int stuck;
+    Vector3 forward = Vector3.right;
     Vector3 movementDir = Vector3.zero;
     bool grounded;
 
@@ -115,7 +116,7 @@ public class Crab : Enemy
         // if (!grounded)
         //     return;
 
-        movementDir = target.x < transform.position.x ? Vector3.left : Vector3.right;
+        movementDir = target.x < transform.position.x ? -forward : forward;
         transform.Translate(movementDir * movementSpeed * Time.deltaTime);
     }
 
@@ -138,15 +139,13 @@ public class Crab : Enemy
         state = EnemyState.wandering;
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    void OnCollisionEnter2D(Collision2D other)
     {
-        //Debug.Log("test1");
-        //Debug.Log(other.gameObject.layer);
-        // if (other.gameObject.layer == 6)
-        // {
-        //     Debug.Log("test2");
-        //     currentXDirection *= -1;
-        // }
+        Vector3 normal;
+        if (Vector3.Dot(Vector3.up, other.GetContact(0).normal) > 0.3)
+            normal = other.GetContact(0).normal;
+        else
+            normal = Vector3.up;
+        forward = Vector3.Cross(normal, Vector3.forward).normalized;
     }
-
 }

@@ -19,12 +19,13 @@ public class PlayerMovement : MonoBehaviour
     public float jumpThrust = 15f;
     public bool airControl = true;
 
+    // Vector3 forward = Vector3.right;
     float groundCheckRadius = 0.1f;
     bool isGrounded = true;
     bool stepSounds = false;
     bool jump = false;
     // Vector3 velocity;
-    Vector3 movement;
+    float inputX;
 
     Rigidbody2D rb;
     //AudioManager am;
@@ -61,18 +62,18 @@ public class PlayerMovement : MonoBehaviour
             //am.PauseClip(am.footstepSFX);
         }
 
-        float inputX = Input.GetAxisRaw("Horizontal");
-        movement = new Vector3(movementSpeed * inputX, 0);
+        inputX = Input.GetAxisRaw("Horizontal");
 
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButtonDown(0))
+        {
             worldGenerator.DeleteTileAt(transform.position + Vector3.down);
             FMODUnity.RuntimeManager.PlayOneShot("event:/Objects/sfx_objects_shovel_dig");
         }
-        if (Input.GetMouseButtonDown(1) && !weaponAnimation.isPlaying && currentWeapon != null)
-        {
-            weaponAnimation.Play();
-        }
-        if(!weaponAnimation.isPlaying) currentWeapon.AttackCycleEnded(); //this is stupid to do this in update instead of some event, if someone can figure out how to fix it please do
+        // if (Input.GetMouseButtonDown(1) && !weaponAnimation.isPlaying && currentWeapon != null)
+        // {
+        //     weaponAnimation.Play();
+        // }
+        // if(!weaponAnimation.isPlaying) currentWeapon.AttackCycleEnded(); //this is stupid to do this in update instead of some event, if someone can figure out how to fix it please do
     }
 
     void FixedUpdate()
@@ -82,6 +83,8 @@ public class PlayerMovement : MonoBehaviour
 
     void MoveHorizontal()
     {
+        Vector3 movement = Vector3.right * inputX * movementSpeed;
+
         transform.Translate(movement * Time.deltaTime);
 
         OnPlayerMove?.Invoke(movement, transform.position, rb.velocity);
@@ -109,5 +112,21 @@ public class PlayerMovement : MonoBehaviour
             stepSounds = false;
         }
 
+    }
+
+    // void OnCollisionEnter2D(Collision2D other)
+    // {
+    //     Vector3 normal;
+    //     if (Vector3.Dot(Vector3.up, other.GetContact(0).normal) > 0.3)
+    //         normal = other.GetContact(0).normal;
+    //     else
+    //         normal = Vector3.up;
+    //     forward = Vector3.Cross(normal, Vector3.forward).normalized;
+    // }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.position + Vector3.right * .3f, 0.1f);
     }
 }

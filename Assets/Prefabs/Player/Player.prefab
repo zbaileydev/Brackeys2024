@@ -143,7 +143,7 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   m_ShapePathHash: 0
   m_Mesh: {fileID: 0}
-  m_InstanceId: 67844
+  m_InstanceId: 54818
   m_LocalBounds:
     m_Center: {x: -0.00000011920929, y: 0, z: 0}
     m_Extent: {x: 0.5000001, y: 0.5, z: 0}
@@ -545,6 +545,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerGFX: {fileID: 3508131888452816324}
+  playerSprite: {fileID: 2579146373032401731}
 --- !u!114 &6956945009493485984
 MonoBehaviour:
   m_ObjectHideFlags: 0
