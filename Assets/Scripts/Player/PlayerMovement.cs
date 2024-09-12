@@ -57,14 +57,17 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = false;
             OnPlayerJump?.Invoke();
             jump = true;
+            FMODUnity.RuntimeManager.PlayOneShot("event:/Player/sfx_player_jump");
             //am.PauseClip(am.footstepSFX);
         }
 
         float inputX = Input.GetAxisRaw("Horizontal");
         movement = new Vector3(movementSpeed * inputX, 0);
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0)) {
             worldGenerator.DeleteTileAt(transform.position + Vector3.down);
+            FMODUnity.RuntimeManager.PlayOneShot("event:/Objects/sfx_objects_shovel_dig");
+        }
         if (Input.GetMouseButtonDown(1) && !weaponAnimation.isPlaying && currentWeapon != null)
         {
             weaponAnimation.Play();
