@@ -111,12 +111,18 @@ public class Crab : Enemy
         if (atTarget)
             return;
 
-        grounded = Physics2D.OverlapCircleAll(groundCheck.position, 0.1f, groundLayer).ToList().Any(x => x.gameObject != gameObject);
+        // grounded = Physics2D.OverlapCircleAll(groundCheck.position, 0.1f, groundLayer).ToList().Any(x => x.gameObject != gameObject);
         // if (!grounded)
         //     return;
 
         movementDir = target.x < transform.position.x ? Vector3.left : Vector3.right;
         transform.Translate(movementDir * movementSpeed * Time.deltaTime);
+    }
+
+    public override void Knockback(float force)
+    {
+        rb.AddForce((-movementDir + Vector3.up) * force, ForceMode2D.Impulse);
+        Stun();
     }
 
     public override void Stun()
