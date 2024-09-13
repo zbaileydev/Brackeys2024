@@ -5,7 +5,7 @@ using TMPro; //TextMeshPro
 public class Spawner : MonoBehaviour
 {
     public GameObject enemyPrefab; // Enemy prefab here
-    public Transform[] spawnPoints; // Multiple array spawn points
+
     public float timeBetweenWaves = 5f; // Time between each wave
     public int enemiesPerWave = 5; // Number of enemies per wave
     public float timeBetweenSpawns = 1f; // Time between enemy spawns within a wave
@@ -28,8 +28,8 @@ public class Spawner : MonoBehaviour
         {
             countdown = 0; //keeps timer on zero while mobs spawn
         }
-
-        waveTimerText.text = "Next Wave In: " + Mathf.Ceil(countdown).ToString() + "s"; //UI text every update
+        //if(Input.GetKeyDown(KeyCode.O)) SpawnEnemy();
+        //waveTimerText.text = "Next Wave In: " + Mathf.Ceil(countdown).ToString() + "s"; //UI text every update
     }
 
     IEnumerator SpawnWave()
@@ -62,7 +62,15 @@ public class Spawner : MonoBehaviour
     private void SpawnEnemy()
     {
         Debug.Log("ENEMY SPAWNED");
-        int spawnIndex = Random.Range(0, spawnPoints.Length);
-        Instantiate(enemyPrefab, spawnPoints[spawnIndex].position, Quaternion.identity);
+        Vector2 initialPoint = (Vector2)GameManager.Instance.player.transform.position + new Vector2((Random.Range(0,2) == 0 ? -1 : 1)*12, GameManager.Instance.player.transform.position.y);
+        bool pointIsValid = false;
+        while(!pointIsValid)
+        {
+            if(!Physics2D.Raycast(initialPoint,Vector2.zero,1, LayerMask.GetMask("Environment")) && Physics2D.Raycast(new Vector2(initialPoint.x,initialPoint.y-1),Vector2.zero,1, LayerMask.GetMask("Environment")))
+                pointIsValid = true;
+            else if(Physics2D.Raycast(new Vector2(initialPoint.x,initialPoint.y+1),Vector2.zero,1, LayerMask.GetMask("Environment"))) initialPoint.y +=1;
+            else initialPoint.y -=1;
+        }
+        Instantiate(enemyPrefab, initialPoint, Quaternion.identity);
     }
 }
