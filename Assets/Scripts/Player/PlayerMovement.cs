@@ -64,11 +64,11 @@ public class PlayerMovement : MonoBehaviour
 
         inputX = Input.GetAxisRaw("Horizontal");
 
-        //if (Input.GetMouseButtonDown(0))
-        //{
-        //    worldGenerator.DeleteTileAt(transform.position + Vector3.down);
-        //    FMODUnity.RuntimeManager.PlayOneShot("event:/Objects/sfx_objects_shovel_dig");
-        //}
+        if (Input.GetMouseButtonDown(0))
+        {
+            worldGenerator.DeleteTileAt(transform.position + Vector3.down);
+            FMODUnity.RuntimeManager.PlayOneShot("event:/Objects/sfx_objects_shovel_dig");
+        }
         // if (Input.GetMouseButtonDown(1) && !weaponAnimation.isPlaying && currentWeapon != null)
         // {
         //     weaponAnimation.Play();

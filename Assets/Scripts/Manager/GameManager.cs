@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviour
 
     public void Update()
     {
-        if (startedGame && SceneManager.GetActiveScene().buildIndex == 1)
+        if (startedGame)
         {
             GameCycle();
         }
@@ -130,6 +130,7 @@ public class GameManager : MonoBehaviour
 
         GameObject newPlayer = Instantiate(playerPrefab, pos, Quaternion.identity);
         player = newPlayer;
+
         Camera.main.GetComponent<CameraFollow>().target = player.transform;
     }
 }

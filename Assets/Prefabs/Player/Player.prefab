@@ -497,7 +497,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 2.25
-  m_Material: {fileID: 6200000, guid: 19c758f541a9f7d688622b526ae00a41, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -529,7 +529,7 @@ MonoBehaviour:
     m_Bits: 65
   currentWeapon: {fileID: 0}
   weaponAnimation: {fileID: 0}
-  movementSpeed: 10
+  movementSpeed: 5
   jumpThrust: 15
   airControl: 1
 --- !u!114 &6228405285423063770
