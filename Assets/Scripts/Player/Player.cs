@@ -18,11 +18,7 @@ public class Player : MonoBehaviour
     private List<ModifierItem> modifiers = new List<ModifierItem>();
 
     private PlayerModifier playerModifier;
-    private PlayerInventory playerInventory;
     private bool modLock;
-    private bool overWeapon;
-
-    private Weapon weaponHover;
 
     // Damage, MovementSpeed, Health, Crit, WeaponSize, Knockback
 
@@ -30,47 +26,19 @@ public class Player : MonoBehaviour
     void Start()
     {
         playerModifier = GetComponent<PlayerModifier>();
-        playerInventory = GetComponent<PlayerInventory>();
         modLock = false;
-        overWeapon = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E) && overWeapon)
-        {
-            PickUpWeapon();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            playerInventory.weaponAnimation.Play();
-        }
+        
     }
 
-    void PickUpWeapon()
-    {
-        /*
-        Using the weapon we found from our collision
-        switch to it and set its stats to our modifiers.
-        Then reset base weapon size and destroy the physical item.
-        */
-        playerInventory.SwitchToWeapon(weaponHover);
-        playerInventory.currentWeapon.UpdateKnockback(baseKnockbackChance);
-        playerInventory.currentWeapon.UpdateCrit(baseCritChance);
-        baseWeaponSize = 0;
-        overWeapon = false;
-        Destroy(weaponHover.gameObject);
-    }
-
+    // Upon picking up a modifier item
+    // call PlayerModifier
     void OnCollisionEnter2D(Collision2D other)
     {
-        /*
-        If we have a loot container we open it and instantiate the loot.
-        If we have loot we pick it up and update our modifiers.
-        If we have a weapon we save it until the player presses E.
-        */
         if (other.gameObject.CompareTag("Loot Container"))
         {
             string item = other.gameObject.GetComponent<LootChest>().GetLoot();
@@ -101,19 +69,6 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (other.gameObject.CompareTag("Weapon"))
-        {
-            overWeapon = true;
-            weaponHover = other.gameObject.GetComponent<Weapon>();
-        }
-    }
-
-    void OnCollisionExit2D(Collision2D other) {
-        if (other.gameObject.CompareTag("Weapon"))
-        {
-            overWeapon = false;
-            weaponHover = null;
-        }
     }
 
 }

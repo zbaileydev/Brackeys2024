@@ -3292,10 +3292,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelManager: {fileID: 871813140}
   MenuManager: {fileID: 1661438023}
+  playerPrefab: {fileID: 8598306330289361133, guid: 28f386052514e6d47a99acc69da225a9, type: 3}
   hud: {fileID: 1798268990}
   cycle: {fileID: 735977520}
-  player: {fileID: 0}
-  playerPrefab: {fileID: 8598306330289361133, guid: 28f386052514e6d47a99acc69da225a9, type: 3}
 --- !u!4 &1619976159
 Transform:
   m_ObjectHideFlags: 0
@@ -3411,7 +3410,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4161923759477655044, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
   m_PrefabInstance: {fileID: 1798268983}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1989867078}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10e1b43190ec1234c97fb6498009e4ae, type: 3}
@@ -3931,7 +3930,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3668733938796550673, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3668733938796550673, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -3939,15 +3938,15 @@ PrefabInstance:
       objectReference: {fileID: 1661438023}
     - target: {fileID: 3668733938796550673, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: PanelSwitch
+      value: ClickPlay
       objectReference: {fileID: 0}
     - target: {fileID: 3668733938796550673, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
-      objectReference: {fileID: 157596490}
+      objectReference: {fileID: 0}
     - target: {fileID: 3668733938796550673, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3766959014695570709, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
       propertyPath: m_text
@@ -4018,10 +4017,10 @@ PrefabInstance:
     - target: {fileID: 9214403932340231279, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1661438023}
+      objectReference: {fileID: 1989867078}
     - target: {fileID: 9214403932340231279, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: PanelSwitch
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4627,6 +4626,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1941888324}
   m_CullTransparentMesh: 1
+--- !u!1 &1989867078 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4579031136310432313, guid: 4dc7de3e3f0fc7d4f83200bc9213c005, type: 3}
+  m_PrefabInstance: {fileID: 1798268983}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2055569925
 GameObject:
   m_ObjectHideFlags: 0
