@@ -41,6 +41,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1113718068594355147}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cf68fcd668054a42b5ff3c3c98f6569, type: 3}
+  m_Script: {fileID: 11500000, guid: 4d0c29939a1d81e41ad4cd236fa54658, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 1
+  animationClip: {fileID: 0}
+  damagedEnemies: []

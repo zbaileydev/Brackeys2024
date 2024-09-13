@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,7 @@ public class LevelLoader : MonoBehaviour
 {
     //public GameObject loadingCanvas;
     private bool loadingCheck;
+    public Action OnLevelLoaded;
 
     public void StartLevelAnimation()
     {
@@ -34,6 +36,7 @@ public class LevelLoader : MonoBehaviour
                 //GameManager.Instance.levelManager.StartGame();
                 loading.allowSceneActivation = true;
                 loadingCheck = true;
+                OnLevelLoaded?.Invoke();
             }
             yield return null;
         }

@@ -12,7 +12,7 @@ public class MenuManager : MonoBehaviour
     public FMODUnity.EventReference hoverSound;
     public FMODUnity.EventReference sliderSound;
     public FMODUnity.EventReference clickSound;
-    
+
 
     [Header("Menu Canvas")]
     public GameObject pauseMenu;
@@ -27,12 +27,10 @@ public class MenuManager : MonoBehaviour
     public Animator animator;
     public Animator pauseAnimator;
 
-    [Header("Managers")]
-    public LevelLoader levelLoader;
 
     private GameObject[] panels;
     private bool isPaused = false;
-    
+
     //private FirstPersonController fpsController;
 
     private void Awake()
@@ -48,9 +46,9 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    void Start() {
-        panels = new GameObject[] {optionsMenu, creditsMenu, mainMenu, pauseMenu};
-        
+    void Start()
+    {
+        panels = new GameObject[] { optionsMenu, creditsMenu, mainMenu, pauseMenu };
     }
 
     public void PanelSwitch(GameObject activePanel)
@@ -70,10 +68,7 @@ public class MenuManager : MonoBehaviour
     {
         foreach (var panel in panels)
         {
-            if (panel != null)
-            {
-                panel.SetActive(false);
-            }
+            panel?.SetActive(false);
         }
 
         // Disable all panels for the loading screen
@@ -81,11 +76,10 @@ public class MenuManager : MonoBehaviour
         if (!hudCondition) activePanel.SetActive(true);
     }
 
-    // Determine if we are returning to the main menu 
+    // Determine if we are returning to the main menu
     // or the pause menu.
     public void BackButton()
     {
-
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         if (currentSceneIndex == 0)
         {
@@ -106,17 +100,17 @@ public class MenuManager : MonoBehaviour
     {
         yield return new WaitForSeconds(3);
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         // If in the editor, stop playing the scene
         UnityEditor.EditorApplication.isPlaying = false;
-        #else
+#else
         // If in a build, quit the application
         Application.Quit();
-        #endif
+#endif
 
         yield return null;
 
-        
+
     }
 
     // SFX for interacting with UI elements.
@@ -156,19 +150,19 @@ public class MenuManager : MonoBehaviour
         PanelSwitch(EndMenu);
     }
 
-    
+
     public void PauseGame()
     {
         isPaused = true;
         //fpsController = FindObjectOfType<FirstPersonController>();
         //if (fpsController != null) fpsController.enabled = false;
         pauseMenu.SetActive(true);
-       
+
         //Cursor.lockState = CursorLockMode.None;
         //Cursor.visible = true;
         //pauseAnimator.Play("menuOpen");
         Time.timeScale = 0f;
-       
+
         //Debug.Log("Timescale is: " + Time.timeScale);
     }
 
@@ -193,38 +187,18 @@ public class MenuManager : MonoBehaviour
     public void ClickPlay()
     {
         FMODUnity.RuntimeManager.PlayOneShot(clickSound);
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        int nextSceneIndex = currentSceneIndex + 1;
-        levelLoader.LoadScene(nextSceneIndex);
-        PanelSwitch(HUDMenu);
-        StartCoroutine(StartHUD());
+        GameManager.Instance.StartGame();
+        GameManager.Instance.worldGenerator.OnTerrainGenerated += StartHUD;
     }
 
     public void RePlay()
     {
         FMODUnity.RuntimeManager.PlayOneShot(clickSound);
-        levelLoader.LoadScene(1);
-        HUDSwitch(HUDMenu, false);
-        StartCoroutine(StartHUD());
+        GameManager.Instance.StartGame();
+        GameManager.Instance.worldGenerator.OnTerrainGenerated += StartHUD;
         Time.timeScale = 1f;
     }
 
-    IEnumerator StartHUD()
-    {
-        // The main issue is beach generation takes multiple seconds
-        // so waiting for the level to load reduces the calm period
-        // need to add an event for when generation finishes.
-        while (levelLoader == null)
-        {
-            yield return new WaitForSeconds(1f);
-        }
-
-        while (!levelLoader.GetLoadingStatus())
-        {
-            yield return new WaitForSeconds(1f);
-        }
-        
-        PanelSwitch(HUDMenu);
-    }
+    void StartHUD() => PanelSwitch(HUDMenu);
 
 }

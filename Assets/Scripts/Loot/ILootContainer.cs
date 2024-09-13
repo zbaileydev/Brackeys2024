@@ -1,6 +1,7 @@
-interface ILootContainer {
-    public LootTable LootTable {get; set;}
-    public bool Looted {get; set;}
+interface ILootContainer
+{
+    public LootTable LootTable { get; set; }
+    public bool Looted { get; set; }
 
-    public string GetLoot();
+    public void GetLoot();
 }

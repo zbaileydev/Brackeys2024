@@ -5,10 +5,11 @@ using UnityEngine.Tilemaps;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; set; }
-    public LevelLoader levelManager;
-    public MenuManager MenuManager;
+
+    public LevelLoader levelLoader;
+    public MenuManager menuManager;
     public Settings settingsManager;
-    // public Tilemap groundTilemap;
+    public WorldGenerator worldGenerator;
     public HUD hud;
     public Cycle cycle;
     [HideInInspector]
@@ -53,10 +54,13 @@ public class GameManager : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-        DontDestroyOnLoad(levelManager.gameObject);
-        DontDestroyOnLoad(MenuManager.gameObject);
+        DontDestroyOnLoad(levelLoader.gameObject);
+        DontDestroyOnLoad(menuManager.gameObject);
         DontDestroyOnLoad(cycle.gameObject);
 
+        var p = FindObjectOfType<Player>();
+        if (p != null)
+            player = p.gameObject;
         settingsManager.LoadSettings();
     }
 
@@ -93,6 +97,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void StartGame()
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = 1;
+        levelLoader.LoadScene(nextSceneIndex);
+
+        levelLoader.OnLevelLoaded += worldGenerator.StartGeneration;
+    }
+
     void GameCycle()
     {
         if (cycle.gameObject.activeInHierarchy == false)
@@ -120,16 +133,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Semirose: Not sure if this belongs here
     public void SpawnPlayer(Vector3 pos)
     {
-        var players = FindObjectsOfType<PlayerMovement>();
+        var players = FindObjectsOfType<Player>();
         if (players.Length != 0)
             foreach (var player in players)
                 Destroy(player.gameObject);
 
-        GameObject newPlayer = Instantiate(playerPrefab, pos, Quaternion.identity);
-        player = newPlayer;
+        player = Instantiate(playerPrefab, pos, Quaternion.identity);
 
         Camera.main.GetComponent<CameraFollow>().target = player.transform;
     }

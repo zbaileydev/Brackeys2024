@@ -12,13 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca1acb24514f5907a20ddc57e3ba7aa, type: 3}
   m_Name: Chest lootTable
   m_EditorClassIdentifier: 
-  defaultItem:
-    item: Nothing
-    chance: 0
   lootTable:
-  - item: Sword
-    chance: 0.421
-  - item: Shield
-    chance: 0.6
-  - item: Nothing
-    chance: 0.026
+  - item: {fileID: 11400000, guid: 54fba410377a1621e99859890da5b82c, type: 2}
+    chance: 1
+  - item: {fileID: 11400000, guid: d4224aac18d55717cb85e6368584ea6d, type: 2}
+    chance: 1
