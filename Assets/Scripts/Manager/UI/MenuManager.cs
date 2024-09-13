@@ -49,7 +49,8 @@ public class MenuManager : MonoBehaviour
     }
 
     // Toggling all panels besides the one passed in.
-    public void PanelSwitch(GameObject activePanel, bool hudCondition = true)
+
+    public void PanelSwitch(GameObject activePanel)
     {
         foreach (var panel in panels)
         {
@@ -57,8 +58,21 @@ public class MenuManager : MonoBehaviour
             {
                 panel.SetActive(false);
             }
-            
         }
+
+        activePanel.SetActive(true);
+    }
+
+    public void HUDSwitch(GameObject activePanel, bool hudCondition)
+    {
+        foreach (var panel in panels)
+        {
+            if (panel != null)
+            {
+                panel.SetActive(false);
+            }
+        }
+
         // Disable all panels for the loading screen
         // before we render the HUD.
         if (!hudCondition) activePanel.SetActive(true);
@@ -79,6 +93,7 @@ public class MenuManager : MonoBehaviour
             PanelSwitch(pauseMenu);
         }
     }
+
 
     public void QuitGame()
     {
@@ -175,7 +190,7 @@ public class MenuManager : MonoBehaviour
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = currentSceneIndex + 1;
         levelLoader.LoadScene(nextSceneIndex);
-        PanelSwitch(HUDMenu, false);
+        HUDSwitch(HUDMenu, false);
         StartCoroutine(StartHUD());
     }
 
