@@ -79,16 +79,21 @@ public class GameManager : MonoBehaviour
             initial = true;
         }
 
-        // if (Input.GetMouseButtonDown(0))
-        // {
-        //     Cursor.lockState = CursorLockMode.Locked;
-        //     Cursor.visible = true;
-        // }
+        if (initial && SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            player = FindObjectOfType<Player>().gameObject;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            //Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = true;
+        }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
-            //Cursor.visible = true;
+            Cursor.visible = true;
         }
     }
 
