@@ -483,6 +483,7 @@ MonoBehaviour:
   BanksToLoad:
   - Master
   - Master.strings
+  - UI
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
   AndroidUseOBB: 0
