@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; set; }
     public LevelLoader levelManager;
     public MenuManager MenuManager;
+    public Settings settingsManager;
     // public Tilemap groundTilemap;
     public HUD hud;
     public Cycle cycle;
@@ -56,7 +57,7 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(MenuManager.gameObject);
         DontDestroyOnLoad(cycle.gameObject);
 
-        player = FindObjectOfType<PlayerMovement>().gameObject;
+        settingsManager.LoadSettings();
     }
 
     public void Update()
@@ -72,6 +73,23 @@ public class GameManager : MonoBehaviour
         {
             startedGame = true;
             initial = true;
+        }
+
+        if (initial && SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            player = FindObjectOfType<Player>().gameObject;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+            //Cursor.visible = true;
         }
     }
 
