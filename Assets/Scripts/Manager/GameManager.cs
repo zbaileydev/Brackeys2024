@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 
     public LevelLoader levelLoader;
     public MenuManager menuManager;
+    public Settings settingsManager;
     public WorldGenerator worldGenerator;
     public HUD hud;
     public Cycle cycle;
@@ -60,6 +61,7 @@ public class GameManager : MonoBehaviour
         var p = FindObjectOfType<Player>();
         if (p != null)
             player = p.gameObject;
+        settingsManager.LoadSettings();
     }
 
     public void Update()
@@ -75,6 +77,18 @@ public class GameManager : MonoBehaviour
         {
             startedGame = true;
             initial = true;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+            //Cursor.visible = true;
         }
     }
 
