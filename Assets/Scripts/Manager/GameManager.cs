@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; set; }
     public LevelLoader levelManager;
     public MenuManager MenuManager;
+    public Settings settingsManager;
     // public Tilemap groundTilemap;
     public HUD hud;
     public Cycle cycle;
@@ -55,6 +56,8 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(levelManager.gameObject);
         DontDestroyOnLoad(MenuManager.gameObject);
         DontDestroyOnLoad(cycle.gameObject);
+
+        settingsManager.LoadSettings();
     }
 
     public void Update()
