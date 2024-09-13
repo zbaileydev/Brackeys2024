@@ -55,11 +55,13 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(levelManager.gameObject);
         DontDestroyOnLoad(MenuManager.gameObject);
         DontDestroyOnLoad(cycle.gameObject);
+
+        player = FindObjectOfType<PlayerMovement>().gameObject;
     }
 
     public void Update()
     {
-        if (startedGame && SceneManager.GetActiveScene().buildIndex == 1)
+        if (startedGame)
         {
             GameCycle();
         }
@@ -70,23 +72,6 @@ public class GameManager : MonoBehaviour
         {
             startedGame = true;
             initial = true;
-        }
-
-        if (initial && SceneManager.GetActiveScene().buildIndex == 1)
-        {
-            player = FindObjectOfType<Player>().gameObject;
-        }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = true;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Cursor.lockState = CursorLockMode.None;
-            //Cursor.visible = true;
         }
     }
 
@@ -127,6 +112,7 @@ public class GameManager : MonoBehaviour
 
         GameObject newPlayer = Instantiate(playerPrefab, pos, Quaternion.identity);
         player = newPlayer;
+
         Camera.main.GetComponent<CameraFollow>().target = player.transform;
     }
 }

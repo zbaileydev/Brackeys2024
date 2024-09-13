@@ -49,7 +49,6 @@ public class WorldGenerator : MonoBehaviour
         public bool buried;
     }
 
-    public GameObject playerObject;
     public LayerTile[] tiles;
     public FeatureTile[] features;
     public StructureObject[] structures;
@@ -79,7 +78,6 @@ public class WorldGenerator : MonoBehaviour
     public float lacunarity = 1;
     public Vector2Int offset = Vector2Int.zero;
     public Tilemap featuresTilemap;
-    public Tilemap structuresTilemap;
     public Tilemap groundTilemap;
 
     List<Vector3> playerChanges = new();
@@ -107,7 +105,7 @@ public class WorldGenerator : MonoBehaviour
 
         Random.InitState(seed);
 
-        playerObject.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
+        GameManager.Instance.player.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
     }
 
     public void DeleteTileAt(Vector3 pos)
@@ -328,7 +326,7 @@ public class WorldGenerator : MonoBehaviour
         for (int x = -heightMapSize, flatSize; x < heightMapSize - 1; x += flatSize)
         {
             flatSize = 1;
-            Vector3Int currentCellPos = structuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + heightMapSize] + 1)));
+            Vector3Int currentCellPos = featuresTilemap.WorldToCell(groundTilemap.CellToWorld(new Vector3Int(x, heightMap[x + heightMapSize] + 1)));
             if (structuresLayer.Any(v => v == currentCellPos.x))
             {
                 // Tile feature = structuresLayer.First(v => v.Key.Equals(currentCellPos)).Value;
