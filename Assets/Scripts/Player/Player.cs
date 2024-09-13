@@ -47,6 +47,12 @@ public class Player : MonoBehaviour
         {
             playerInventory.weaponAnimation.Play();
         }
+
+        if (Health <= 0)
+        {
+            // pause game, tell menu manager to turn on the game over screen
+            MenuManager.Instance.GameOver();
+        }
     }
 
     void PickUpWeapon()
