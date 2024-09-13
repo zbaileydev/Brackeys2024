@@ -17,9 +17,7 @@ public class PlayerModifier : MonoBehaviour
                 player.baseMovementSpeed += modifier.Value;
                 break;
             case ModifierType.Health:
-                // Fully heal the player and increase their max health.
                 player.baseHealth += modifier.Value;
-                player.Health = player.baseHealth;
                 break;
             case ModifierType.Crit:
                 player.baseCritChance += modifier.Value;
