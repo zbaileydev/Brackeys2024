@@ -32,7 +32,36 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.E) && overWeapon)
+        {
+            PickUpWeapon();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            playerInventory.weaponAnimation.Play();
+        }
+
+        if (Health <= 0)
+        {
+            // pause game, tell menu manager to turn on the game over screen
+            MenuManager.Instance.GameOver();
+        }
+    }
+
+    void PickUpWeapon()
+    {
+        /*
+        Using the weapon we found from our collision
+        switch to it and set its stats to our modifiers.
+        Then reset base weapon size and destroy the physical item.
+        */
+        playerInventory.SwitchToWeapon(weaponHover);
+        playerInventory.currentWeapon.UpdateKnockback(baseKnockbackChance);
+        playerInventory.currentWeapon.UpdateCrit(baseCritChance);
+        baseWeaponSize = 0;
+        overWeapon = false;
+        Destroy(weaponHover.gameObject);
     }
 
     // Upon picking up a modifier item

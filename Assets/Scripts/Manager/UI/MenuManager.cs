@@ -1,6 +1,6 @@
 using System.Collections;
+using FMOD.Studio;
 using FMODUnity;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +12,7 @@ public class MenuManager : MonoBehaviour
     public FMODUnity.EventReference hoverSound;
     public FMODUnity.EventReference sliderSound;
     public FMODUnity.EventReference clickSound;
+    
 
     [Header("Menu Canvas")]
     public GameObject pauseMenu;
@@ -19,6 +20,8 @@ public class MenuManager : MonoBehaviour
     public GameObject creditsMenu;
     public GameObject mainMenu;
     public GameObject HUDMenu;
+    public GameObject EndMenu;
+    public GameObject PauseMenu;
 
     [Header("Transitions")]
     public Animator animator;
@@ -29,6 +32,7 @@ public class MenuManager : MonoBehaviour
 
     private GameObject[] panels;
     private bool isPaused = false;
+    
     //private FirstPersonController fpsController;
 
     private void Awake()
@@ -46,6 +50,7 @@ public class MenuManager : MonoBehaviour
 
     void Start() {
         panels = new GameObject[] {optionsMenu, creditsMenu, mainMenu, pauseMenu};
+        
     }
 
     // Toggling all panels besides the one passed in.
@@ -128,28 +133,33 @@ public class MenuManager : MonoBehaviour
             }
             else
             {
-                //PauseGame();
+                PauseGame();
             }
         }
     }
 
-    /*
+    public void GameOver()
+    {
+        Time.timeScale = 0f;
+        PanelSwitch(EndMenu);
+    }
+
+    
     public void PauseGame()
     {
         isPaused = true;
-        fpsController = FindObjectOfType<FirstPersonController>();
-
-        if (fpsController != null) fpsController.enabled = false;
+        //fpsController = FindObjectOfType<FirstPersonController>();
+        //if (fpsController != null) fpsController.enabled = false;
         pauseMenu.SetActive(true);
        
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        pauseAnimator.Play("menuOpen");
+        //Cursor.lockState = CursorLockMode.None;
+        //Cursor.visible = true;
+        //pauseAnimator.Play("menuOpen");
         Time.timeScale = 0f;
        
-        Debug.Log("Timescale is: " + Time.timeScale);
+        //Debug.Log("Timescale is: " + Time.timeScale);
     }
-    */
+
 
     public void ResumeGame()
     {
@@ -159,11 +169,10 @@ public class MenuManager : MonoBehaviour
 
     IEnumerator ResumeGameAnimation()
     {
-        //pauseAnimator.Play("menuClose");
         Time.timeScale = 1f;
-        //pauseMenu.SetActive(false);
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        pauseMenu.SetActive(false);
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
         isPaused = false;
         //if (fpsController != null) fpsController.enabled = true;
         yield return null;
@@ -177,6 +186,15 @@ public class MenuManager : MonoBehaviour
         levelLoader.LoadScene(nextSceneIndex);
         PanelSwitch(HUDMenu, false);
         StartCoroutine(StartHUD());
+    }
+
+    public void RePlay()
+    {
+        FMODUnity.RuntimeManager.PlayOneShot(clickSound);
+        levelLoader.LoadScene(1);
+        HUDSwitch(HUDMenu, false);
+        StartCoroutine(StartHUD());
+        Time.timeScale = 1f;
     }
 
     IEnumerator StartHUD()
