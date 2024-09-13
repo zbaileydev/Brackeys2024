@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Tilemaps;
 
 public class WorldGenerator : MonoBehaviour
@@ -80,6 +78,9 @@ public class WorldGenerator : MonoBehaviour
     public Tilemap featuresTilemap;
     public Tilemap groundTilemap;
 
+    public System.Action OnTerrainGenerated;
+    [HideInInspector]
+
     List<Vector3> playerChanges = new();
     List<int> regionsWithLoot = new();
     List<int> featuresLayer = new();
@@ -95,17 +96,35 @@ public class WorldGenerator : MonoBehaviour
     bool updateFeatures = true;
     bool updateStructures = true;
     bool updateLoot = true;
+    bool spawnPlayer = false;
+    bool gameStarted = false;
     int[] heightMap;
 
-    void Start()
+    public void StartGeneration()
+    {
+        spawnPlayer = true;
+        Init();
+        gameStarted = true;
+    }
+
+    public void StopGeneration()
+    {
+        gameStarted = false;
+    }
+
+    void Update()
+    {
+        if (gameStarted)
+            Loop();
+    }
+
+    void Init()
     {
         xPos = 0;
 
         playerChanges.Clear();
 
         Random.InitState(seed);
-
-        GameManager.Instance.player.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
     }
 
     public void DeleteTileAt(Vector3 pos)
@@ -126,7 +145,7 @@ public class WorldGenerator : MonoBehaviour
     //     }
     // }
 
-    void Update()
+    void Loop()
     {
         if (previous_xPos != xPos)
             update = true;
@@ -182,7 +201,14 @@ public class WorldGenerator : MonoBehaviour
             PlaceStructures(heightMap);
         if (updateLoot)
             PlaceLoot(heightMap);
-        // PlaceLoot(heightMap[(heightMapSize - chunkSize)..(heightMapSize + chunkSize)]);
+        if (spawnPlayer)
+        {
+            spawnPlayer = false;
+            GameManager.Instance.SpawnPlayer(groundTilemap.CellToWorld(new Vector3Int(0, heightMap[heightMapSize] + 3)));
+            GameManager.Instance.player.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
+        }
+
+        OnTerrainGenerated?.Invoke();
     }
 
     void CheckArguments()

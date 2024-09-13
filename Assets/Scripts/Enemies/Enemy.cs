@@ -47,7 +47,10 @@ public abstract class Enemy : MonoBehaviour
     virtual public void Init()
     {
         target = PickTarget();
-        playerTransform = GameManager.Instance.player.transform;
+        var player = GameManager.Instance.player;
+        if (player != null)
+            playerTransform = player.transform;
+
         rb = GetComponent<Rigidbody2D>();
 
         movementSpeed = wanderingSpeed;
@@ -61,6 +64,7 @@ public abstract class Enemy : MonoBehaviour
     public abstract void Knockback(float force);
     public virtual void Die()
     {
+        Debug.Log("💀", gameObject);
         Destroy(gameObject);
     }
 
@@ -83,6 +87,11 @@ public abstract class Enemy : MonoBehaviour
     {
         if (Stunned)
             return;
+        if (playerTransform == null)
+            if (GameManager.Instance.player == null)
+                return;
+            else
+                playerTransform = GameManager.Instance.player.transform;
 
         if ((playerTransform.position - transform.position).sqrMagnitude <= detectionRadius * detectionRadius)
         {

@@ -10,14 +10,10 @@ public class PlayerMovement : MonoBehaviour
     public Action<Vector3, Vector3, Vector3> OnPlayerMove;
     public Action OnPlayerLand;
 
-    public WorldGenerator worldGenerator;
     public Transform[] groundChecks;
     public LayerMask groundLayer;
-    public Weapon currentWeapon;
-    [SerializeField] Animation weaponAnimation;
     public float movementSpeed = 10f;
     public float jumpThrust = 15f;
-    public bool airControl = true;
 
     // Vector3 forward = Vector3.right;
     float groundCheckRadius = 0.1f;
@@ -64,11 +60,6 @@ public class PlayerMovement : MonoBehaviour
 
         inputX = Input.GetAxisRaw("Horizontal");
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            worldGenerator.DeleteTileAt(transform.position + Vector3.down);
-            FMODUnity.RuntimeManager.PlayOneShot("event:/Objects/sfx_objects_shovel_dig");
-        }
         // if (Input.GetMouseButtonDown(1) && !weaponAnimation.isPlaying && currentWeapon != null)
         // {
         //     weaponAnimation.Play();
@@ -123,10 +114,4 @@ public class PlayerMovement : MonoBehaviour
     //         normal = Vector3.up;
     //     forward = Vector3.Cross(normal, Vector3.forward).normalized;
     // }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(transform.position + Vector3.right * .3f, 0.1f);
-    }
 }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1620235529980633707}
   - component: {fileID: -1032320653671089559}
   - component: {fileID: 2296369934910281818}
-  - component: {fileID: 7471359969957298336}
+  - component: {fileID: 5418563373455623851}
   m_Layer: 0
   m_Name: Shield
   m_TagString: Loot
@@ -131,7 +131,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7471359969957298336
+--- !u!114 &5418563373455623851
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -140,8 +140,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 8503959343709183662}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bf69305f4b77d64a996940baf77b593, type: 3}
+  m_Script: {fileID: 11500000, guid: d736786e04e7d564185a1337c44d4905, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modifierType: 2
-  modifierValue: 5
+  type: 0
+  type: 1

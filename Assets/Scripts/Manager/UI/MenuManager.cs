@@ -24,8 +24,6 @@ public class MenuManager : MonoBehaviour
     public Animator animator;
     public Animator pauseAnimator;
 
-    [Header("Managers")]
-    public LevelLoader levelLoader;
 
     private GameObject[] panels;
     private bool isPaused = false;
@@ -44,8 +42,9 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    void Start() {
-        panels = new GameObject[] {optionsMenu, creditsMenu, mainMenu, pauseMenu};
+    void Start()
+    {
+        panels = new GameObject[] { optionsMenu, creditsMenu, mainMenu, pauseMenu };
     }
 
     // Toggling all panels besides the one passed in.
@@ -57,7 +56,6 @@ public class MenuManager : MonoBehaviour
             {
                 panel.SetActive(false);
             }
-            
         }
         // Disable all panels for the loading screen
         // before we render the HUD.
@@ -68,7 +66,6 @@ public class MenuManager : MonoBehaviour
     // or the pause menu.
     public void BackButton()
     {
-
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         if (currentSceneIndex == 0)
         {
@@ -89,17 +86,17 @@ public class MenuManager : MonoBehaviour
     {
         yield return new WaitForSeconds(3);
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         // If in the editor, stop playing the scene
         UnityEditor.EditorApplication.isPlaying = false;
-        #else
+#else
         // If in a build, quit the application
         Application.Quit();
-        #endif
+#endif
 
         yield return null;
 
-        
+
     }
 
     // SFX for interacting with UI elements.
@@ -172,29 +169,11 @@ public class MenuManager : MonoBehaviour
     public void ClickPlay()
     {
         FMODUnity.RuntimeManager.PlayOneShot(clickSound);
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        int nextSceneIndex = currentSceneIndex + 1;
-        levelLoader.LoadScene(nextSceneIndex);
+        GameManager.Instance.StartGame();
+        GameManager.Instance.worldGenerator.OnTerrainGenerated += StartHUD;
         PanelSwitch(HUDMenu, false);
-        StartCoroutine(StartHUD());
     }
 
-    IEnumerator StartHUD()
-    {
-        // The main issue is beach generation takes multiple seconds
-        // so waiting for the level to load reduces the calm period
-        // need to add an event for when generation finishes.
-        while (levelLoader == null)
-        {
-            yield return new WaitForSeconds(1f);
-        }
-
-        while (!levelLoader.GetLoadingStatus())
-        {
-            yield return new WaitForSeconds(1f);
-        }
-        
-        PanelSwitch(HUDMenu);
-    }
+    void StartHUD() => PanelSwitch(HUDMenu);
 
 }

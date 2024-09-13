@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7251587080128861233}
   m_Layer: 0
   m_Name: Loot Chest
-  m_TagString: Loot Container
+  m_TagString: Loot_container
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -72,14 +72,14 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1853201363
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 1
+  m_DrawMode: 0
   m_Size: {x: 2, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
@@ -125,7 +125,7 @@ BoxCollider2D:
     oldSize: {x: 1, y: 1}
     newSize: {x: 2, y: 2}
     adaptiveTilingThreshold: 0.5
-    drawMode: 1
+    drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
@@ -143,5 +143,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ba7f9fb12ee715498b5602123d79513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LootPrefab: {fileID: 5213110598144447984, guid: d5ae1bee8401023e1a33a452212d1626, type: 3}
   lootTable: {fileID: 0}
   looted: 0

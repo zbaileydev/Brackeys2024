@@ -4,11 +4,11 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Loot Container
   - Floor
-  - Loot
   - Enemy
   - Weapon
+  - Loot
+  - Loot_container
   layers:
   - Default
   - TransparentFX

@@ -420,7 +420,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a02e2c9ac16be174886d59936bc6dc68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerObject: {fileID: 0}
   tiles:
   - tile: {fileID: 11400000, guid: 3801480c661f687a8a4fd112cee11114, type: 2}
     depth: 1
@@ -564,7 +563,7 @@ MonoBehaviour:
   belowSlopeLeft: {fileID: 11400000, guid: 570bb4aca2439705483bb096c47a28c7, type: 2}
   chunkSize: 22
   heightMapSize: 50
-  chunkBottomLimit: -7
+  chunkBottomLimit: -20
   minSpaceBetweenLootContainers: 10
   seed: 0
   octaves: 2
@@ -572,7 +571,7 @@ MonoBehaviour:
   scale: 15
   frequency: 4
   lacunarity: 0.382
-  offset: {x: 0, y: -10}
+  offset: {x: 0, y: -17}
   featuresTilemap: {fileID: 4802542092983566780}
   groundTilemap: {fileID: 1411407907881552732}
   xPos: 0

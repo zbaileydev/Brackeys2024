@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-
     public float Health;
     public GameObject[] Inventory;
 
@@ -15,60 +14,47 @@ public class Player : MonoBehaviour
     public float baseKnockbackChance;
     public float baseWeaponSize;
 
-    private List<ModifierItem> modifiers = new List<ModifierItem>();
-
-    private PlayerModifier playerModifier;
-    private bool modLock;
+    [HideInInspector]
+    public List<ModifierItem> modifiers = new List<ModifierItem>();
 
     // Damage, MovementSpeed, Health, Crit, WeaponSize, Knockback
 
     // Start is called before the first frame update
     void Start()
     {
-        playerModifier = GetComponent<PlayerModifier>();
-        modLock = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
-    // Upon picking up a modifier item
-    // call PlayerModifier
-    void OnCollisionEnter2D(Collision2D other)
+    public void ApplyModifier(ModifierItem modifier)
     {
-        if (other.gameObject.CompareTag("Loot Container"))
+        switch (modifier.type)
         {
-            string item = other.gameObject.GetComponent<LootChest>().GetLoot();
-            if (item != string.Empty)
-            {
-                //Debug.Log($"Collected {item}");
-                GameObject lootPrefab = Resources.Load<GameObject>($"Loot/{item}");
-
-                if (lootPrefab != null)
-                {
-                    // Destroy the chest and create the item.
-                    Destroy(other.gameObject);
-                    Instantiate(lootPrefab, transform.position, Quaternion.identity);
-                }
-            }
+            case ModifierType.Damage:
+                baseDamage += modifier.value;
+                break;
+            case ModifierType.MovementSpeed:
+                baseMovementSpeed += modifier.value;
+                break;
+            case ModifierType.Health:
+                baseHealth += modifier.value;
+                break;
+            case ModifierType.Crit:
+                baseCritChance += modifier.value;
+                break;
+            case ModifierType.WeaponSize:
+                baseWeaponSize += modifier.value;
+                break;
+            case ModifierType.Knockback:
+                baseKnockbackChance += modifier.value;
+                break;
+            default:
+                Debug.LogWarning("Unknown modifier type: " + modifier.type);
+                break;
         }
-
-        if (other.gameObject.CompareTag("Loot"))
-        {
-            if (other.gameObject.GetComponent<Item>() != null && !modLock)
-            {
-                modLock = true;
-                ModifierItem modifierItem = other.gameObject.GetComponent<Item>().GetModifier();
-                Debug.Log(modifierItem);
-                playerModifier.ApplyModifier(modifierItem);
-                Destroy(other.gameObject);
-                modLock = false;
-            }
-        }
-
     }
-
 }
