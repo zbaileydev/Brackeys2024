@@ -79,11 +79,11 @@ public class GameManager : MonoBehaviour
             initial = true;
         }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = true;
-        }
+        // if (Input.GetMouseButtonDown(0))
+        // {
+        //     Cursor.lockState = CursorLockMode.Locked;
+        //     Cursor.visible = true;
+        // }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        int nextSceneIndex = currentSceneIndex + 1;
+        int nextSceneIndex = 1;
         levelLoader.LoadScene(nextSceneIndex);
 
         levelLoader.OnLevelLoaded += worldGenerator.StartGeneration;

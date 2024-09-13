@@ -127,13 +127,17 @@ public class WorldGenerator : MonoBehaviour
         Random.InitState(seed);
     }
 
-    public void DeleteTileAt(Vector3 pos)
+    public bool DeleteTileAt(Vector3 pos)
     {
         if (!playerChanges.Any(x => x.Equals(pos)))
         {
             playerChanges.Add(pos);
             update = true;
         }
+        if (groundTilemap.GetTile(groundTilemap.WorldToCell(pos)) != null)
+            return true;
+
+        return false;
     }
 
     // public void ModifyTileAt(Vector3 pos, Tile newTile)

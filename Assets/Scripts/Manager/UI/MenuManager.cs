@@ -76,7 +76,7 @@ public class MenuManager : MonoBehaviour
         if (!hudCondition) activePanel.SetActive(true);
     }
 
-    // Determine if we are returning to the main menu 
+    // Determine if we are returning to the main menu
     // or the pause menu.
     public void BackButton()
     {

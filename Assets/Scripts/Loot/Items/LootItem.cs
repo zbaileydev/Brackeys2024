@@ -94,28 +94,15 @@ public class LootItem : MonoBehaviour
 
         if (other.gameObject.CompareTag("Player"))
         {
-            switch (type)
-            {
-                case Loot.LootType.Tool:
-                    other.gameObject.GetComponent<PlayerInventory>().SwitchTool(new Tool(loot as LootTool));
-                    Debug.Log($"picked up tool: {(loot as LootTool).name}");
-                    break;
-                case Loot.LootType.Weapon:
-                    other.gameObject.GetComponent<PlayerInventory>().SwitchWeapon(new Weapon(loot as LootWeapon));
-                    Debug.Log($"picked up weapon: {(loot as LootWeapon).name}");
-                    break;
-                case Loot.LootType.Consumable:
-                    other.gameObject.GetComponent<PlayerInventory>().AddToInventory(new Consumable(loot as LootConsumable));
-                    Debug.Log($"picked up consumable: {(loot as LootConsumable).name}");
-                    break;
-                case Loot.LootType.Modifier:
-                    other.gameObject.GetComponent<Player>().ApplyModifier((loot as LootModifier).modifier);
-                    Debug.Log($"picked up modifier: {(loot as LootModifier).name}");
-                    break;
-                default:
-                    break;
-            }
-            Destroy(gameObject);
+            other.gameObject.GetComponent<PlayerInteractions>().SetLootUnder(this);
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            other.gameObject.GetComponent<PlayerInteractions>().ResetLootUnder(this);
         }
     }
 }
