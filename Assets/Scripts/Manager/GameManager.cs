@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -114,6 +115,7 @@ public class GameManager : MonoBehaviour
         }
 
         hud.UpdateTimerText(cycle.GetTimer());
+        hud.UpdateHealthText(player.GetComponent<Player>().Health);
 
         if (cycle.GetTimer() < 2f)
         {
@@ -135,11 +137,14 @@ public class GameManager : MonoBehaviour
 
     public void SpawnPlayer(Vector3 pos)
     {
+        Debug.Log("Spawn started");
         var players = FindObjectsOfType<Player>();
         if (players.Length != 0)
             foreach (var player in players)
                 Destroy(player.gameObject);
-
+        
+        Debug.Log(pos);
+        //Debug.Log(playerPrefab);
         player = Instantiate(playerPrefab, pos, Quaternion.identity);
 
         Camera.main.GetComponent<CameraFollow>().target = player.transform;

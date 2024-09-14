@@ -1,6 +1,7 @@
 using UnityEngine;
 
 public enum ModifierType { Damage, MovementSpeed, Health, Crit, WeaponSize, Knockback }
+
 [System.Serializable]
 public struct ModifierItem
 {

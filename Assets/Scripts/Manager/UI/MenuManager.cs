@@ -3,6 +3,7 @@ using FMOD.Studio;
 using FMODUnity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
@@ -187,6 +188,7 @@ public class MenuManager : MonoBehaviour
     public void ClickPlay()
     {
         FMODUnity.RuntimeManager.PlayOneShot(clickSound);
+        ClearImage();
         GameManager.Instance.StartGame();
         GameManager.Instance.worldGenerator.OnTerrainGenerated += StartHUD;
     }
@@ -197,6 +199,12 @@ public class MenuManager : MonoBehaviour
         GameManager.Instance.StartGame();
         GameManager.Instance.worldGenerator.OnTerrainGenerated += StartHUD;
         Time.timeScale = 1f;
+    }
+
+    public void ClearImage()
+    {
+        Image image = GetComponent<Image>();
+        image.enabled = false;
     }
 
     void StartHUD() => PanelSwitch(HUDMenu);

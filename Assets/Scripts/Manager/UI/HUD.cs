@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class HUD : MonoBehaviour
 {
@@ -25,19 +26,19 @@ public class HUD : MonoBehaviour
         }
     }
 
-    public void UpdateHealthText(string newHealth)
+    public void UpdateHealthText(float newHealth)
     {
-        if (health != null) health.text = newHealth;
+        if (health != null) health.text = string.Format("Health: {0}", newHealth.ToString());
     }
 
     // We might want to update an image next to the items.
     public void UpdateWeaponText(string newWeapon)
     {
-        if (weapon != null) weapon.text = newWeapon;
+        if (weapon != null) weapon.text = string.Format("Weapon: {0}", newWeapon);
     }
 
     public void UpdateToolText(string newTool)
     {
-        if (tool != null) tool.text = newTool;
+        if (tool != null) tool.text = string.Format("Tool: {0}", newTool);
     }
 }
