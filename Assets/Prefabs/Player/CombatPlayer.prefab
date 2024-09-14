@@ -195,6 +195,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6815711a2c6e2734fbcb28b05b072839, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  holding: 0
+  LootPrefab: {fileID: 0}
   WeaponToolHolder: {fileID: 7826868739244469486}
 --- !u!114 &4236270201573935946
 MonoBehaviour:
@@ -208,7 +210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91bd2f15effe641429d7654fc40b8da9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Health: 0
+  Health: 100
   Inventory: []
   baseCritChance: 0
   baseMovementSpeed: 0

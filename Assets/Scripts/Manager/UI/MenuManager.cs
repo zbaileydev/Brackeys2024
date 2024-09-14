@@ -193,12 +193,13 @@ public class MenuManager : MonoBehaviour
         GameManager.Instance.worldGenerator.OnTerrainGenerated += StartHUD;
     }
 
-    public void RePlay()
+    public void Replay()
     {
         FMODUnity.RuntimeManager.PlayOneShot(clickSound);
-        GameManager.Instance.StartGame();
-        GameManager.Instance.worldGenerator.OnTerrainGenerated += StartHUD;
+        HUDSwitch(EndMenu, true);
         Time.timeScale = 1f;
+        GameManager.Instance.ReplayGame();
+        //GameManager.Instance.worldGenerator.OnTerrainGenerated += StartHUD;
     }
 
     public void ClearImage()

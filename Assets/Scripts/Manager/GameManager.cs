@@ -107,6 +107,16 @@ public class GameManager : MonoBehaviour
         levelLoader.OnLevelLoaded += worldGenerator.StartGeneration;
     }
 
+    public void ReplayGame()
+    {
+        cycle.Restart();
+        startedGame = false;
+        // No need for async or any magic, insta load the main menu.
+        //SceneManager.LoadScene(0);
+        SceneManager.LoadScene("Menu");
+        //levelLoader.OnLevelLoaded += worldGenerator.StartGeneration;
+    }
+
     void GameCycle()
     {
         if (cycle.gameObject.activeInHierarchy == false)
@@ -114,8 +124,14 @@ public class GameManager : MonoBehaviour
             cycle.gameObject.SetActive(true);
         }
 
-        hud.UpdateTimerText(cycle.GetTimer());
-        hud.UpdateHealthText(player.GetComponent<Player>().Health);
+        if (hud.gameObject.activeInHierarchy == true)
+        {
+            hud.UpdateTimerText(cycle.GetTimer());
+            if (player != null)
+            {
+                hud.UpdateHealthText(player.GetComponent<Player>().Health);
+            }
+        }
 
         if (cycle.GetTimer() < 2f)
         {
@@ -133,6 +149,15 @@ public class GameManager : MonoBehaviour
             Debug.Log("Storm");
             initial = false;
         }
+
+        if (player != null)
+        {
+            if (player.GetComponent<Player>().Health <= 0)
+            {
+                menuManager.GameOver();
+            }
+        }
+
     }
 
     public void SpawnPlayer(Vector3 pos)
@@ -143,8 +168,11 @@ public class GameManager : MonoBehaviour
             foreach (var player in players)
                 Destroy(player.gameObject);
         
-        Debug.Log(pos);
-        //Debug.Log(playerPrefab);
+        // If either are null we need to delay...
+        while (playerPrefab == null || pos == null)
+        {
+            Debug.Log(playerPrefab);
+        }
         player = Instantiate(playerPrefab, pos, Quaternion.identity);
 
         Camera.main.GetComponent<CameraFollow>().target = player.transform;

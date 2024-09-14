@@ -208,6 +208,10 @@ public class WorldGenerator : MonoBehaviour
         if (spawnPlayer)
         {
             spawnPlayer = false;
+            while (groundTilemap == null || GameManager.Instance == null)
+            {
+                Debug.Log(groundTilemap);
+            }
             GameManager.Instance.SpawnPlayer(groundTilemap.CellToWorld(new Vector3Int(0, heightMap[heightMapSize] + 3)));
             GameManager.Instance.player.GetComponent<PlayerMovement>().OnPlayerMove += OnPlayerMove;
         }

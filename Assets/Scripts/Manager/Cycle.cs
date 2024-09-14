@@ -39,6 +39,13 @@ public class Cycle : MonoBehaviour
         }
     }
 
+    public void Restart()
+    {
+        StopCoroutine(CountdownCycle());
+        currentTime = 0;
+        isCalmPhase = true;
+    }
+
     public void Start()
     {
         StartCoroutine(CountdownCycle());
