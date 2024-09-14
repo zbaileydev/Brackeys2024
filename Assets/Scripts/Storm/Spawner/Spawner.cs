@@ -1,76 +1,47 @@
-using System.Collections;
 using UnityEngine;
-using TMPro; //TextMeshPro
 
 public class Spawner : MonoBehaviour
 {
     public GameObject enemyPrefab; // Enemy prefab here
-
-    public float timeBetweenWaves = 5f; // Time between each wave
-    public int enemiesPerWave = 5; // Number of enemies per wave
-    public float timeBetweenSpawns = 1f; // Time between enemy spawns within a wave
-    public TextMeshProUGUI waveTimerText; //UI
-
-    private float countdown; //tracking timer for next waves
-    private int waveNumber = 1;
+    public float spawnRadius = 20f; // Radius around the player for spawning enemies
+    public LayerMask collisionMask; // Define layers to check for collisions
+    private Transform player; // Reference to the player's transform
+    private int maxSpawnAttempts = 10; // Maximum number of attempts to find a legal spawn position
 
     private void Start()
     {
-        //starts spawning event
-        countdown = timeBetweenWaves; //sets countdown to timeBetweenwaves
-        StartCoroutine(SpawnWave());
+        player = GameObject.FindGameObjectWithTag("Player").transform; // Find the player object by tag
     }
 
-    private void Update()
+    public void SpawnEnemy(GameObject enemyPrefab)
     {
-        countdown -= Time.deltaTime;
-        if (countdown <= 0)
+        UnityEngine.Vector3 spawnPosition = UnityEngine.Vector3.zero;
+        bool validPositionFound = false;
+        float enemyHeight = enemyPrefab.GetComponent<Collider2D>().bounds.size.y / 2; // Half height for accurate placement
+
+        for (int i = 0; i < maxSpawnAttempts; i++)
         {
-            countdown = 0; //keeps timer on zero while mobs spawn
-        }
-        //if(Input.GetKeyDown(KeyCode.O)) SpawnEnemy();
-        //waveTimerText.text = "Next Wave In: " + Mathf.Ceil(countdown).ToString() + "s"; //UI text every update
-    }
+            UnityEngine.Vector2 randomDirection = UnityEngine.Random.insideUnitCircle * spawnRadius;
+            spawnPosition = new UnityEngine.Vector3(player.position.x + randomDirection.x, player.position.y + enemyHeight, 0);
 
-    IEnumerator SpawnWave()
-    {
-        while (true)
+            // Debug: Check spawn position
+            UnityEngine.Debug.DrawLine(player.position, spawnPosition, UnityEngine.Color.red, 2f);
+
+            if (!Physics2D.OverlapCircle(spawnPosition, enemyPrefab.transform.localScale.x / 2, collisionMask))
+            {
+                validPositionFound = true;
+                break;
+            }
+        }
+
+        if (validPositionFound)
         {
-            countdown = timeBetweenWaves; //Reset Countdown before new waves
-
-            //Variable of timeBetweenWaves will adjust the spawn timer
-            yield return new WaitForSeconds(timeBetweenWaves);
-            StartCoroutine(SpawnEnemies(waveNumber));
-            waveNumber++;
-
-            countdown = timeBetweenWaves;
-            //adjusting diffculty, by adding enemiesPerWave += ##, timeBetweenWaves = Mathf.Max(1f, timeBetweenWaves - 0.5f);, 
+            GameObject newEnemy = Instantiate(enemyPrefab, spawnPosition, UnityEngine.Quaternion.identity);
+            UnityEngine.Debug.Log("Enemy spawned at: " + spawnPosition);
         }
-    }
-    IEnumerator SpawnEnemies(int waveSize)
-    {
-        //This can be adjusted to increase difficulty per wave
-        for (int i = 0; i < waveSize * enemiesPerWave; i++)
+        else
         {
-            SpawnEnemy();
-            yield return new WaitForSeconds(timeBetweenSpawns);
+            UnityEngine.Debug.LogWarning("Could not find a valid spawn location after multiple attempts.");
         }
-    }
-
-    //spawns the enemy  (Prefab, can add multiple prefabs by adding more Prefab variables
-
-    private void SpawnEnemy()
-    {
-        Debug.Log("ENEMY SPAWNED");
-        Vector2 initialPoint = (Vector2)GameManager.Instance.player.transform.position + new Vector2((Random.Range(0,2) == 0 ? -1 : 1)*12, GameManager.Instance.player.transform.position.y);
-        bool pointIsValid = false;
-        while(!pointIsValid)
-        {
-            if(!Physics2D.Raycast(initialPoint,Vector2.zero,1, LayerMask.GetMask("Environment")) && Physics2D.Raycast(new Vector2(initialPoint.x,initialPoint.y-1),Vector2.zero,1, LayerMask.GetMask("Environment")))
-                pointIsValid = true;
-            else if(Physics2D.Raycast(new Vector2(initialPoint.x,initialPoint.y+1),Vector2.zero,1, LayerMask.GetMask("Environment"))) initialPoint.y +=1;
-            else initialPoint.y -=1;
-        }
-        Instantiate(enemyPrefab, initialPoint, Quaternion.identity);
     }
 }
