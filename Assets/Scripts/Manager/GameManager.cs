@@ -158,6 +158,8 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        UpdateStormPresence();
+    }
 
     // @marcohamersma Feel free to move this to a more appropriate place
     void UpdateStormPresence()
