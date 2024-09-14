@@ -154,6 +154,7 @@ public class GameManager : MonoBehaviour
         {
             if (player.GetComponent<Player>().Health <= 0)
             {
+                FMODUnity.RuntimeManager.PlayOneShotAttached("event:/Player/sfx_player_die", player.GetComponent<Player>().gameObject);
                 menuManager.GameOver();
             }
         }
@@ -181,7 +182,7 @@ public class GameManager : MonoBehaviour
         if (players.Length != 0)
             foreach (var player in players)
                 Destroy(player.gameObject);
-        
+
         // If either are null we need to delay...
         while (playerPrefab == null || pos == null)
         {
