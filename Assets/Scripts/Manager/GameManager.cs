@@ -158,6 +158,18 @@ public class GameManager : MonoBehaviour
             }
         }
 
+
+    // @marcohamersma Feel free to move this to a more appropriate place
+    void UpdateStormPresence()
+    {
+        /** A value from 0-1 representing how close the storm is. Used for audio
+         * purposes  */
+        var value = 1f;
+        if (cycle.GetCalmPhase()) {
+            value = 1 - (cycle.currentTime / cycle.calmTime);
+        }
+
+        FMODUnity.RuntimeManager.StudioSystem.setParameterByName("storm presence", value);
     }
 
     public void SpawnPlayer(Vector3 pos)
