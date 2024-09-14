@@ -37,11 +37,13 @@ public class PlayerInteractions : MonoBehaviour
                 {
                     GetComponent<PlayerInventory>().SwitchTool(new Tool(lootUnder.loot as LootTool));
                     Debug.Log($"picked up tool: {(lootUnder.loot as LootTool).name}");
+                    FMODUnity.RuntimeManager.PlayOneShot("event:/Objects/event:/Objects/sfx_objects_pickup");
                 }
                 else if (lootUnder.loot is LootWeapon)
                 {
                     GetComponent<PlayerInventory>().SwitchWeapon(new Weapon(lootUnder.loot as LootWeapon));
                     Debug.Log($"picked up weapon: {(lootUnder.loot as LootWeapon).name}");
+                    FMODUnity.RuntimeManager.PlayOneShot("event:/Objects/event:/Objects/sfx_objects_pickup");
                 }
                 else if (lootUnder.loot is LootConsumable)
                 {
@@ -52,6 +54,7 @@ public class PlayerInteractions : MonoBehaviour
                 {
                     GetComponent<Player>().ApplyModifier((lootUnder.loot as LootModifier).modifier);
                     Debug.Log($"picked up modifier: {(lootUnder.loot as LootModifier).name}");
+                    FMODUnity.RuntimeManager.PlayOneShot("event:/Objects/event:/Objects/sfx_modifier_pickup");
                 }
                 else
                 {
