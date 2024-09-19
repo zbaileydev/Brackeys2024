@@ -154,10 +154,25 @@ public class GameManager : MonoBehaviour
         {
             if (player.GetComponent<Player>().Health <= 0)
             {
+                FMODUnity.RuntimeManager.PlayOneShotAttached("event:/Player/sfx_player_die", player.GetComponent<Player>().gameObject);
                 menuManager.GameOver();
             }
         }
 
+        UpdateStormPresence();
+    }
+
+    // @marcohamersma Feel free to move this to a more appropriate place
+    void UpdateStormPresence()
+    {
+        /** A value from 0-1 representing how close the storm is. Used for audio
+         * purposes  */
+        var value = 1f;
+        if (cycle.GetCalmPhase()) {
+            value = 1 - (cycle.currentTime / cycle.calmTime);
+        }
+
+        FMODUnity.RuntimeManager.StudioSystem.setParameterByName("storm presence", value);
     }
 
     public void SpawnPlayer(Vector3 pos)
@@ -167,7 +182,7 @@ public class GameManager : MonoBehaviour
         if (players.Length != 0)
             foreach (var player in players)
                 Destroy(player.gameObject);
-        
+
         // If either are null we need to delay...
         while (playerPrefab == null || pos == null)
         {

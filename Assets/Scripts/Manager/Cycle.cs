@@ -9,8 +9,8 @@ public class Cycle : MonoBehaviour
     public float stormTime = 90f;
 
     private bool isCalmPhase = true;
-    private float currentTime = 0;
-       
+    public float currentTime = 0;
+
     IEnumerator CountdownCycle()
     {
         while (true)
@@ -62,5 +62,5 @@ public class Cycle : MonoBehaviour
         return isCalmPhase;
     }
 
-   
+
 }

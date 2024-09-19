@@ -15,11 +15,18 @@ public class Crab : Enemy
     Vector3 movementDir = Vector3.zero;
     bool grounded;
 
+    private FMODUnity.StudioEventEmitter attackSoundEmitter;
     void Start()
     {
         Init();
         lastStuckCheckPos = transform.position;
         lastStuckCheckTime = 0;
+
+        attackSoundEmitter = GetComponent<FMODUnity.StudioEventEmitter>();
+         if (attackSoundEmitter == null)
+        {
+            Debug.LogError("StudioEventEmitter component not found on this GameObject.");
+        }
     }
 
     void Update()
@@ -90,6 +97,7 @@ public class Crab : Enemy
     {
         lastAttackTime = Time.time;
         Debug.Log("Attacked player!");
+        attackSoundEmitter.Play();
     }
 
     public override Vector3 PickTarget()
